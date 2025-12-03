@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -37,7 +40,7 @@ jobs:
           $(Build.ArtifactStagingDirectory)\**
           **\bin\Release\**
         retention-days: 7
-      
+   
     - name: Prepare release ZIP
       shell: pwsh
       run: |
@@ -52,22 +55,22 @@ jobs:
         Write-Output "Created $zipName"
 
     - name: Create GitHub Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       id: create_release
       uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         tag_name: v${{ github.run_number }}
         release_name: Release ${{ github.run_number }}
         draft: false
         prerelease: false
 
     - name: Upload ZIP to Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: '**\bin\Release\SampleCSharpUI-${{ github.run_number }}.zip'
+        asset_path: SampleCSharpUI-${{ github.run_number }}.zip
         asset_name: SampleCSharpUI-${{ github.run_number }}.zip
         asset_content_type: application/zip
