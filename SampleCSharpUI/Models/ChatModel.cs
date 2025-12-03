@@ -1,0 +1,514 @@
+﻿using SampleCSharpUI.Commons;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Threading;
+using static SampleCSharpUI.Commons.APIData;
+
+namespace SampleCSharpUI.Models
+{
+    internal class ChatModel : INotifyPropertyChanged
+    {
+        private SynchronizationContext Context { get; set; } = SynchronizationContext.Current;
+        public string IdToken { get; private set; } = string.Empty;
+
+        #region "認証関連"
+        private TimeSpan ExpireInterval;
+        private DispatcherTimer ExpireTimer = new DispatcherTimer();
+
+        /// <summary>
+        /// GAP接続済
+        /// </summary>
+        private bool _IsLogin = false;
+        public bool IsLogin
+        {
+            get { return _IsLogin; }
+            private set
+            {
+                if (_IsLogin != value)
+                {
+                    _IsLogin = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Represents the username associated with the current user.
+        /// </summary>
+        private string _UserName = string.Empty;
+        public string UserName
+        {
+            get { return _UserName; }
+            private set
+            {
+                if (_UserName != value)
+                {
+                    _UserName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 初期設定済
+        /// </summary>
+        public bool IsSettings { get { return !string.IsNullOrEmpty(Config.ClientId) && !string.IsNullOrEmpty(Config.TenantName); } }
+
+        /// <summary>
+        /// GAPと接続
+        /// </summary>
+        /// <returns></returns>
+        internal async Task ConnectAsync()
+        {
+            this.ExpireTimer.Stop();
+
+            // 接続処理
+            this.IdToken = string.Empty;
+            this.UserName = string.Empty;
+            this.IsLogin = !string.IsNullOrEmpty(this.IdToken);
+            using (var id = new MicrosoftIdentityModel())
+            {
+                await id.LoginAsync(Config.ClientId, Config.TenantName);
+                this.IdToken = id.IdToken;
+                this.UserName = id.UserName;
+                this.ExpireInterval = id.ExpireInterval;
+                this.ExpireTimer.Interval = this.ExpireInterval;
+            }
+            if (!string.IsNullOrEmpty(this.IdToken))
+            {
+                this.ExpireTimer.Start();
+            }
+            this.IsLogin = !string.IsNullOrEmpty(this.IdToken);
+
+            // チャットルーム一覧取得
+            await GetChatRoomsAsync();
+        }
+
+        /// <summary>
+        /// GAPとの切断
+        /// </summary>
+        /// <returns></returns>
+        internal async Task DisconnectAsync()
+        {
+            this.ExpireTimer.Stop();
+            this.IdToken = string.Empty;
+            this.UserName = string.Empty;
+            this.IsLogin = !string.IsNullOrEmpty(this.IdToken);
+            using (var id = new MicrosoftIdentityModel())
+            {
+                await id.Logout();
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// コンストラクター
+        /// </summary>
+        public ChatModel()
+        {
+            this.ExpireTimer.Stop();
+
+            // 認証キー期限切れ対応
+            this.ExpireTimer.Tick += async (s, e) =>
+            {
+                this.ExpireTimer.Stop();
+                try
+                {
+                    using (var id = new MicrosoftIdentityModel())
+                    {
+                        await id.LoginAsync(Config.ClientId, Config.TenantName);
+                        this.IdToken = id.IdToken;
+                        this.UserName = id.UserName;
+                        this.ExpireInterval = id.ExpireInterval;
+                        this.ExpireTimer.Interval = this.ExpireInterval;
+                    }
+                    if (!string.IsNullOrEmpty(this.IdToken))
+                    {
+                        this.ExpireTimer.Start();
+                    }
+                }
+                catch
+                {
+                    this.ExpireTimer.Start();
+                }
+            };
+        }
+
+        #region "チャット関連"
+        public ObservableCollection<Models.TDataChatRoom> ChatRooms = new ObservableCollection<Models.TDataChatRoom>();
+        public ObservableCollection<TMessage> Messages = new ObservableCollection<TMessage>();
+
+        private Models.TDataChatRoom _SelectedChatRoom = null;
+        public Models.TDataChatRoom SelectedChatRoom
+        {
+            get { return this._SelectedChatRoom; }
+            set
+            {
+                if (this._SelectedChatRoom != value)
+                {
+                    this._SelectedChatRoom = value;
+                    OnPropertyChanged();
+
+                    // 選択済チャットルームID保存
+                    if (this._SelectedChatRoom != null)
+                    {
+                        Config.SelectedChatRoomID = this._SelectedChatRoom?.ID;
+                        Config.SaveProperties();
+                    }
+                }
+            }
+        }
+
+        // チャットルーム一覧取得処理
+        internal async Task GetChatRoomsAsync()
+        {
+            const string defaultChatRoomName = "General Use";
+            var defaultChatRoomID = string.Empty;
+
+            // 一覧取得
+            this.ChatRooms.Clear();
+            {
+                var jsonString = await HttpHelper.GetRequestAsync("/api/v1/chats", this.IdToken);
+                using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+                {
+                    var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(List<APIData.TChat>));
+                    {
+                        var result = ser.ReadObject(json) as List<APIData.TChat>;
+                        foreach (var chat in result)
+                        {
+                            var chatRoom = new Models.TDataChatRoom()
+                            {
+                                ID = chat.id,
+                                Name = chat.name,
+                                ChatTemplateId = chat.chat_template_id,
+                                RetrieverIDs = chat.retriever_ids,
+                            };
+                            this.ChatRooms.Add(chatRoom);
+                        }
+                        json.Close();
+                    }
+                }
+            }
+
+            // [General Use」名のチャットルームがないときは作成
+            defaultChatRoomID = this.ChatRooms.Where((x) => x.Name == defaultChatRoomName).FirstOrDefault()?.ID;
+            if (this.ChatRooms.Count == 0 || string.IsNullOrEmpty(defaultChatRoomID))
+            {
+                defaultChatRoomID = await this.CreateChatRoomAsync(defaultChatRoomName, string.Empty);
+            }
+            else if (!string.IsNullOrEmpty(defaultChatRoomID))
+            {
+                // 「General Use」チャットルームの会話の内容をクリア
+                await ClearChatRoomAsync(defaultChatRoomID);
+            }
+
+            // 保存したChatRoomIDのチャットがあれば選択、無ければ「General Use」を選択
+            if (this.ChatRooms.Count > 0)
+            {
+                var savedChatRoomID = this.ChatRooms.FirstOrDefault((x) => x.ID == Config.SelectedChatRoomID)?.ID;
+                if (!string.IsNullOrEmpty(savedChatRoomID))
+                {
+                    this.SelectedChatRoom = this.ChatRooms.FirstOrDefault((x) => x.ID == savedChatRoomID);
+                }
+                else
+                {
+                    // Name が defaultChatRoomID の最初の要素を取得し、なければ先頭要素を選択する
+                    var target = this.ChatRooms.FirstOrDefault((x) => x.ID == defaultChatRoomID);
+                    this.SelectedChatRoom = target ?? this.ChatRooms[0];
+                }
+            }
+        }
+
+        /// <summary>
+        /// チャットルーム作成処理
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="retrieverID"></param>
+        /// <returns></returns>
+        internal async Task<string> CreateChatRoomAsync(string name, string retrieverID)
+        {
+            var id = string.Empty;
+            var body = new APIData.TChatRoom()
+            {
+                name = name,
+                retriever_ids = string.IsNullOrEmpty(retrieverID) ? new string[] { } : new string[] { retrieverID },
+                chat_template_id = string.IsNullOrEmpty(retrieverID) ? "builtin.chat" : "builtin.document_combine",
+                model = "cohere.command-r-plus-fujitsu"
+            };
+
+            // ここで body を JSON 文字列にシリアライズして変数に格納する
+            using (var ms = new MemoryStream())
+            {
+                var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChatRoom));
+                {
+                    serializer.WriteObject(ms, body);
+                    var bodyJsonString = Encoding.UTF8.GetString(ms.ToArray());
+                    var jsonString = await HttpHelper.PostRequestAsync("/api/v1/chats", this.IdToken, bodyJsonString);
+                    using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+                    {
+                        var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChat));
+                        {
+                            var result = ser.ReadObject(json) as APIData.TChat;
+                            var chatRoom = new Models.TDataChatRoom()
+                            {
+                                ID = result.id,
+                                Name = result.name,
+                                ChatTemplateId = result.chat_template_id,
+                                RetrieverIDs = result.retriever_ids,
+                            };
+                            this.ChatRooms.Add(chatRoom);
+                            id = chatRoom.ID;
+                            json.Close();
+
+                            // チャットルーム設定処理
+                            result.chat_setting.tokens_budget = new APIData.TTokensBudget()
+                            {
+                                history = string.IsNullOrEmpty(retrieverID) ? 125000 : 62500,
+                                documents = string.IsNullOrEmpty(retrieverID) ? 0 : 62500,
+                                answer = string.IsNullOrEmpty(retrieverID) ? 2048 : 2048
+                            };
+                            await SettingChatRoomAsync(id, result);
+                        }
+                    }
+                }
+            }
+            return id;
+        }
+
+        // チャットルーム設定処理
+        private async Task SettingChatRoomAsync(string id, APIData.TChat setting)
+        {
+            using (var ms = new MemoryStream())
+            {
+                var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChat));
+                {
+                    serializer.WriteObject(ms, setting);
+                    var bodyJsonString = Encoding.UTF8.GetString(ms.ToArray());
+                    var jsonString = await HttpHelper.PutRequestAsync($"/api/v1/chats/{id}", this.IdToken, bodyJsonString);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 会話一覧取得処理 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        internal async Task GetChatsAsync(string id)
+        {
+            // 一覧取得
+            this.Messages.Clear();
+            if (!string.IsNullOrEmpty(id))
+            {
+                var jsonString = await HttpHelper.GetRequestAsync($"/api/v1/chats/{id}/messages", this.IdToken);
+                using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+                {
+                    var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(List<APIData.TChatMessage>));
+                    {
+                        var results = ser.ReadObject(json) as List<APIData.TChatMessage>;
+                        foreach (var item in results)
+                        {
+                            var message = new TMessage()
+                            {
+                                Role = item.role,
+                                Content = item.content,
+                                Time = DateTimeOffset.FromUnixTimeMilliseconds(item.timeunix).ToLocalTime().DateTime,
+                                Refs = item.ref_chunks is null ? new List<string>() : item.ref_chunks?.Select((x) => x.text.Replace("\n\n","\n")).ToList(),
+                            };
+                            message.PropertyChanged += (s, e) => { OnPropertyChanged("Messages_Item"); };
+                            this.Messages.Add(message);
+                        }
+
+                        // 最新行表示
+                        OnPropertyChanged("Messages_Item");
+                    }
+                    json.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// チャットルーム内会話クリア処理 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        internal async Task ClearChatRoomAsync(string id)
+        {
+            //　チャットルーム情報取得
+            var body = new APIData.TChat();
+            if (!string.IsNullOrEmpty(id))
+            {
+                var jsonString = await HttpHelper.GetRequestAsync($"/api/v1/chats/{id}", this.IdToken);
+                using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+                {
+                    var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChat));
+                    {
+                        body = ser.ReadObject(json) as APIData.TChat;
+                    }
+                    json.Close();
+                }
+
+                // 会話内容クリア
+                body.messages = new APIData.TChatMessage[] { };
+
+                // ここで body を JSON 文字列にシリアライズして変数に格納する
+                using (var ms = new MemoryStream())
+                {
+                    var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChat));
+                    {
+                        serializer.WriteObject(ms, body);
+                        var bodyJsonString = Encoding.UTF8.GetString(ms.ToArray());
+                        jsonString = await HttpHelper.PutRequestAsync($"/api/v1/chats/{id}", this.IdToken, bodyJsonString);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// プロンプト入力
+        /// </summary>
+        /// <param name="inputText"></param>
+        internal async Task SendMessageAsync(string inputText)
+        {
+            var content = inputText ?? string.Empty;
+            if (!string.IsNullOrWhiteSpace(content))
+            {
+                var body = new APIData.TChatMessage()
+                {
+                    role = "user",
+                    content = content,
+                };
+
+                // ここで body を JSON 文字列にシリアライズして変数に格納する
+                using (var ms = new MemoryStream())
+                {
+                    var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChatMessage));
+                    {
+                        serializer.WriteObject(ms, body);
+                        var bodyJsonString = Encoding.UTF8.GetString(ms.ToArray());
+                        var jsonString = await HttpHelper.PostRequestAsync($"/api/v1/chats/{this.SelectedChatRoom.ID}/messages", this.IdToken, bodyJsonString);
+                        using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+                        {
+                            var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChatMessage));
+                            {
+                                var item = ser.ReadObject(json) as APIData.TChatMessage;
+                                var message = new TMessage()
+                                {
+                                    Role = item.role,
+                                    Content = item.content,
+                                    Time = DateTimeOffset.FromUnixTimeMilliseconds(item.timeunix).ToLocalTime().DateTime,
+                                    Refs = item.ref_chunks is null ? new List<string>() : item.ref_chunks?.Select((x) => x.text.Replace("\n\n", "\n")).ToList(),
+                                };
+                                message.PropertyChanged += (s, e) => { OnPropertyChanged("Messages_Item"); };
+                                this.Messages.Add(message);
+                            }
+                            json.Close();
+
+                            // 最新行表示
+                            OnPropertyChanged("Messages_Item");
+                        }
+
+                        // AIからの回答取得
+                        jsonString = await HttpHelper.PostRequestAsync($"/api/v1/chats/{this.SelectedChatRoom.ID}/messages/createNextAiMessage", this.IdToken, "{}");
+                        using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+                        {
+                            var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChatMessage));
+                            {
+                                var item = ser.ReadObject(json) as APIData.TChatMessage;
+                                var message = new TMessage()
+                                {
+                                    Role = item.role,
+                                    Content = item.content,
+                                    Time = DateTimeOffset.FromUnixTimeMilliseconds(item.timeunix).ToLocalTime().DateTime,
+                                    Refs = item.ref_chunks is null ? new List<string>() : item.ref_chunks?.Select((x) => x.text.Replace("\n\n", "\n")).ToList(),
+                                };
+                                message.PropertyChanged += (s, e) => { OnPropertyChanged("Messages_Item"); };
+                                this.Messages.Add(message);
+                            }
+                            json.Close();
+
+                            // 最新行表示
+                            OnPropertyChanged("Messages_Item");
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 最新の入力プロンプトまでを削除する（AI空の回答がある場合は、その回答まで削除する
+        /// </summary>
+        /// <returns>最新の入力プロンプト</returns>
+        internal async Task<string> DeleteMessageAsync()
+        {
+            var promptText = string.Empty;  
+            var lastUserMessageIndex = -1;
+            for (var index = this.Messages.Count - 1; index >= 0; index--)
+            {
+                if (this.Messages[index].Role == "user")
+                {
+                    lastUserMessageIndex = index;
+                    promptText = this.Messages[index].Content;  
+                    break;
+                }
+            }
+            if (lastUserMessageIndex != -1)
+            {
+                // 最後のユーザーメッセージ以降のメッセージを削除
+                var messagesToDelete = this.Messages.Count - lastUserMessageIndex;
+                for (int i = 0; i < messagesToDelete; i++)
+                {
+                    var jsonString = await HttpHelper.PostRequestAsync($"/api/v1/chats/{this.SelectedChatRoom.ID}/messages/removeLastMessage", this.IdToken, string.Empty);
+                    this.Messages.RemoveAt(this.Messages.Count - 1);
+                }
+                OnPropertyChanged("Messages_Item");
+            }
+            return promptText;
+        }
+        #endregion
+
+        // プロパティが変更されたときに通知するイベント
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // プロパティ変更通知を発行するメソッド
+        protected virtual void OnPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            var handler = this.PropertyChanged;
+            if (handler != null)
+                handler(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    /// <summary>
+    /// チャットルーム
+    /// </summary>
+    public class TDataChatRoom
+    {
+        public string ID { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string ChatTemplateId { get; set; } = string.Empty;
+        public string[] RetrieverIDs { get; set; } = null;
+    }
+
+    /// <summary>
+    /// リトリーバー
+    /// </summary>
+    public class TDataRetriever
+    {
+        public string ID { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string EmbeddingModel { get; set; } = string.Empty;
+        public string[] OriginIDs { get; set; } = null;
+    }
+}
