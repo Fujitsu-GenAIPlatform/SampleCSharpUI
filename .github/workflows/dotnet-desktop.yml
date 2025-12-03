@@ -28,11 +28,40 @@ jobs:
     
     - name: Build WPF Application
       run: msbuild SampleCSharpUI.sln /p:Configuration=Release /p:Platform="Any CPU"
-        
-    - name: Upload GitHub Pages artifact - SampleCSharpUI.zip
+      
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: SampleCSharpUI-${{ github.run_number }}
+        path: |
+          $(Build.ArtifactStagingDirectory)\**
+          **\bin\Release\**
+        retention-days: 70
+
+    - name: Create ZIP (optional, resilient)
+      if: always()
       shell: powershell
       run: |
-        $sourcePath = "bin\Release"
         $zipName = "SampleCSharpUI-${{ github.run_number }}.zip"
-        Compress-Archive -Path $sourcePath -DestinationPath $zipName -Force
+        $outDir = "$(Build.ArtifactStagingDirectory)\"
+        # Collect candidate paths (OutDir and any project bin\Release)
+        $paths = @()
+        if (Test-Path $outDir) { $paths += $outDir }
+          $paths += (Get-ChildItem -Path . -Recurse -Directory -Filter 'bin' -ErrorAction SilentlyContinue |
+            ForEach-Object { Join-Path $_.FullName 'Release' } |
+            Where-Object { Test-Path $_ } )
+            if ($paths.Count -eq 0) {
+              Write-Host "No build outputs found to zip. Skipping ZIP creation."
+              exit 0
+        }
+        $items = @()
+        foreach ($p in $paths) {
+          $items += (Get-ChildItem -Path $p -Recurse -File | Select-Object -ExpandProperty FullName)
+        }
+        if ($items.Count -eq 0) {
+          Write-Host "No files found in output folders. Skipping ZIP creation."
+          exit 0
+        }
+        Compress-Archive -Path $items -DestinationPath $zipName -Force
         echo "ZIP_FILE=$zipName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        
