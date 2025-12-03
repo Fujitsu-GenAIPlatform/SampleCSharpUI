@@ -27,7 +27,7 @@ jobs:
       run: nuget restore SampleCSharpUI.sln
     
     - name: Build WPF Application
-      run: msbuild SampleCSharpUI.sln /p:Configuration=Release /p:Platform="Any CPU" /p:TargetFrameworkVersion=v4.7
+      run: msbuild SampleCSharpUI.sln /p:Configuration=Release /p:Platform="Any CPU"
         
     - name: Upload GitHub Pages artifact - SampleCSharpUI.zip
       shell: powershell
