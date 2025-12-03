@@ -29,8 +29,8 @@ jobs:
     - name: Build WPF Application
       run: msbuild SampleCSharpUI.sln /p:Configuration=Release /p:Platform="Any CPU"
       
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
       with:
         name: SampleCSharpUI-${{ github.run_number }}
         path: |
