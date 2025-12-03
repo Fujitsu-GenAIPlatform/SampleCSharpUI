@@ -36,7 +36,7 @@ jobs:
         path: |
           $(Build.ArtifactStagingDirectory)\**
           **\bin\Release\**
-        retention-days: 70
+        retention-days: 7
 
     - name: Create ZIP (optional, resilient)
       if: always()
@@ -65,3 +65,34 @@ jobs:
         Compress-Archive -Path $items -DestinationPath $zipName -Force
         echo "ZIP_FILE=$zipName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         
+    - name: Confirm ZIP exists
+      shell: powershell
+      run: |
+        if (-not (Test-Path $env:ZIP_FILE)) {
+          Write-Host "ZIP file not found: $env:ZIP_FILE"
+          exit 0
+        }
+        Write-Host "ZIP file ready: $env:ZIP_FILE"
+
+    - name: Create GitHub Release (only if ZIP was created)
+      if: env.ZIP_FILE != ''
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: "Build ${{ github.run_number }}"
+        body: "Automated build created by workflow ${{ github.workflow }} run ${{ github.run_number }}"
+        draft: false
+        prerelease: false
+
+    - name: Upload ZIP to Release
+      if: env.ZIP_FILE != ''
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ env.ZIP_FILE }}
+        asset_name: ${{ env.ZIP_FILE }}
+        asset_content_type: application/zip
