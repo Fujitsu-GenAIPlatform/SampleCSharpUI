@@ -1,0 +1,41 @@
+name: Build WPF Application
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+  
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+   
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+      with:
+        vs-version: '[17.0, 18.0]'
+    
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1
+      with:
+        nuget-version: 'latest'
+
+    - name: Restore NuGet packages
+      run: nuget restore SampleCSharpUI.sln
+    
+    - name: Build WPF Application
+      run: msbuild SampleCSharpUI.sln /p:Configuration=Release /p:Platform="Any CPU" /p:TargetFrameworkVersion=v4.7
+        
+    - name: Upload GitHub Pages artifact - SampleCSharpUI.zip
+      shell: powershell
+      run: |
+        $sourcePath = "bin\Release"
+        $zipName = "SampleCSharpUI-${{ github.run_number }}.zip"
+        Compress-Archive -Path $sourcePath -DestinationPath $zipName -Force
+        echo "ZIP_FILE=$zipName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
