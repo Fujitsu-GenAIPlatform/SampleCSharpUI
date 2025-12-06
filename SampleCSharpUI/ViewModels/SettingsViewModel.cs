@@ -24,6 +24,24 @@ namespace SampleCSharpUI.ViewModels
             set { this.Model.ClientId = value; }
         }
 
+        public bool IsUseOSWebView
+        {
+            get { return this.Model.IsUseOSWebView; }
+            set { this.Model.IsUseOSWebView = value; }
+        }   
+
+        public bool IsPromptAuthentication
+        {
+            get { return this.Model.IsPromptAuthentication; }
+            set { this.Model.IsPromptAuthentication = value; }
+        }
+
+        public string ClientSecret
+        {
+            get { return this.Model.ClientSecret; }
+            set { this.Model.ClientSecret = value; }
+        }
+
         /// <summary>
         /// Busy表示用
         /// </summary>

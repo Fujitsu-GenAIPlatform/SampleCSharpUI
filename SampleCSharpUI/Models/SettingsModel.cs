@@ -39,6 +39,48 @@ namespace SampleCSharpUI.Models
             }
         }
 
+        private bool _IsUseOSWebView = Config.IsUseOSWebView;
+        public bool IsUseOSWebView
+        {
+            get { return _IsUseOSWebView; }
+            set
+            {
+                if (_IsUseOSWebView != value)
+                {
+                    _IsUseOSWebView = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsPromptAuthentication = Config.IsPromptAuthentication;
+        public bool IsPromptAuthentication
+        {
+            get { return _IsPromptAuthentication; }
+            set
+            {
+                if (_IsPromptAuthentication != value)
+                {
+                    _IsPromptAuthentication = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _ClientSecret = Config.ClientSecret;
+        public string ClientSecret
+        {
+            get { return _ClientSecret; }
+            set
+            {
+                if (_ClientSecret != value)
+                {
+                    _ClientSecret = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public SettingsModel()
         {
             Config.LoadProperties();
@@ -58,6 +100,9 @@ namespace SampleCSharpUI.Models
             // 設定を保存する
             Config.TenantName = this.TenantName;
             Config.ClientId = this.ClientId;
+            Config.IsUseOSWebView = this.IsUseOSWebView;
+            Config.IsPromptAuthentication = this.IsPromptAuthentication;
+            Config.ClientSecret = this.ClientSecret;
             Config.SaveProperties();
         }
 

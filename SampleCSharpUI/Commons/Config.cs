@@ -11,6 +11,10 @@ namespace SampleCSharpUI.Commons
         internal static string TenantName { get; set; }
         internal static string SelectedChatRoomID { get; set; }
 
+        internal static bool IsUseOSWebView { get; set; }
+        internal static bool IsPromptAuthentication { get; set; }
+        internal static string ClientSecret { get; set; }
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -46,6 +50,9 @@ namespace SampleCSharpUI.Commons
                             Config.ClientId = recvData.ClientId;
                             Config.TenantName = recvData.TenantName;
                             Config.SelectedChatRoomID = recvData.SelectedChatRoomID;
+                            Config.IsUseOSWebView = recvData.IsUseOSWebView;
+                            Config.IsPromptAuthentication = !recvData.IsNotPromptAuthentication;
+                            Config.ClientSecret = CryptographyHelper.DecryptStringe(recvData.ClientSecret);
 
                             // 必要に応じて config を返すか、他の方法で利用してください
                         }
@@ -56,6 +63,9 @@ namespace SampleCSharpUI.Commons
                     Config.ClientId = string.Empty;
                     Config.TenantName = string.Empty;
                     Config.SelectedChatRoomID = string.Empty;
+                    Config.IsUseOSWebView = false;
+                    Config.IsPromptAuthentication = true;
+                    Config.ClientSecret = string.Empty;
                 }
             }
             catch { }
@@ -104,6 +114,9 @@ namespace SampleCSharpUI.Commons
                     st.ClientId = Config.ClientId;
                     st.TenantName = Config.TenantName;
                     st.SelectedChatRoomID = Config.SelectedChatRoomID;
+                    st.IsUseOSWebView = Config.IsUseOSWebView;
+                    st.IsNotPromptAuthentication = !Config.IsPromptAuthentication;
+                    st.ClientSecret = CryptographyHelper.EncryptString(Config.ClientSecret);
 
                     using (var writer = JsonReaderWriterFactory.CreateJsonWriter(ms, System.Text.Encoding.UTF8, true, true, "  "))
                     {
@@ -136,6 +149,12 @@ namespace SampleCSharpUI.Commons
             public string TenantName { get; set; }
             [DataMember]
             public string SelectedChatRoomID { get; set; }
+            [DataMember]
+            public bool IsUseOSWebView { get; set; }
+            [DataMember]
+            public bool IsNotPromptAuthentication { get; set; }
+            [DataMember]
+            public string ClientSecret { get; set; }
         }
     }
 }

@@ -79,7 +79,14 @@ namespace SampleCSharpUI.Models
             this.IsLogin = !string.IsNullOrEmpty(this.IdToken);
             using (var id = new MicrosoftIdentityModel())
             {
-                await id.LoginAsync(Config.ClientId, Config.TenantName);
+                if (Config.IsPromptAuthentication)
+                {
+                    await id.LoginAsync(Config.ClientId, Config.TenantName);
+                }
+                else
+                {
+                    await id.LoginAsync(Config.ClientId, Config.TenantName, Config.ClientSecret);
+                }
                 this.IdToken = id.IdToken;
                 this.UserName = id.UserName;
                 this.ExpireInterval = id.ExpireInterval;
@@ -127,7 +134,14 @@ namespace SampleCSharpUI.Models
                 {
                     using (var id = new MicrosoftIdentityModel())
                     {
-                        await id.LoginAsync(Config.ClientId, Config.TenantName);
+                        if (Config.IsPromptAuthentication)
+                        {
+                            await id.LoginAsync(Config.ClientId, Config.TenantName);
+                        }
+                        else
+                        {
+                            await id.LoginAsync(Config.ClientId, Config.TenantName, Config.ClientSecret);
+                        }
                         this.IdToken = id.IdToken;
                         this.UserName = id.UserName;
                         this.ExpireInterval = id.ExpireInterval;

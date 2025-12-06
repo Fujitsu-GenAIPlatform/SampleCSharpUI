@@ -1,4 +1,5 @@
 ﻿using Microsoft.Identity.Client;
+using SampleCSharpUI.Commons;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -29,7 +30,7 @@ namespace SampleCSharpUI.Models
         }
 
         /// <summary>
-        /// MSALログイン
+        /// MSALログイン（対話認証）
         /// </summary>
         /// <returns></returns>
         internal async Task<bool> LoginAsync(string clientId, string tenantName)
@@ -98,13 +99,65 @@ namespace SampleCSharpUI.Models
             return isLogin;
         }
 
+        // 対話ログイン
         private async Task<AuthenticationResult> AcquireTokenInteractiveAsync()
         {
             var auth = App.PublicClientApp
                         .AcquireTokenInteractive(this.Scopes)
+                        .WithUseEmbeddedWebView(!Config.IsUseOSWebView)
                         .WithAccount(null)
                         .WithPrompt(Prompt.SelectAccount);
             return await auth.ExecuteAsync().ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// MSALログイン（非対話認証）
+        /// </summary>
+        /// <returns></returns>
+        internal async Task<bool> LoginAsync(string clientId, string tenantName, string clientSecret)
+        {
+            var isLogin = false;
+            var redirectUri = "http://localhost";
+            var idToken = string.Empty;
+
+            var signInPolicy = "B2C_1_fjcloud_genai_susi";
+            var authorityBase = $"https://{tenantName}.b2clogin.com/tfp/{tenantName}.onmicrosoft.com/";
+            var scopes = new string[] { $"https://{tenantName}.onmicrosoft.com/{clientId}/.default" };
+            var builder = ConfidentialClientApplicationBuilder
+                .Create(clientId)
+                .WithRedirectUri(redirectUri)
+                .WithB2CAuthority($"{authorityBase}{signInPolicy}")
+                .WithClientSecret(clientSecret);
+            var app = builder.Build();
+            try
+            {
+                var result = await app.AcquireTokenForClient(scopes).ExecuteAsync();
+                idToken = result.AccessToken;
+                if (!string.IsNullOrEmpty(idToken))
+                {
+                    var handler = new JwtSecurityTokenHandler();
+                    var data = handler.ReadJwtToken(idToken);//JwtSecurityTokenHandlerを使ってトークンをデータ化する
+                    if (data != null)
+                    {
+                        var expClaim = data.Claims.FirstOrDefault(x => x.Type.Equals("exp"))?.Value;
+                        if (!string.IsNullOrEmpty(expClaim))
+                        {
+                            var dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expClaim));
+                            this.ExpireInterval = dateTimeOffset.UtcDateTime.AddMinutes(-3).Subtract(DateTime.UtcNow);
+                        }
+                        this.UserName = data.Claims.FirstOrDefault(x => x.Type.Equals("name"))?.Value ?? "SYSTEM";
+                    }
+                    isLogin = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                this.IdToken = idToken;
+                throw ex;
+            }
+
+            this.IdToken = idToken;
+            return isLogin;
         }
 
         /// <summary>
