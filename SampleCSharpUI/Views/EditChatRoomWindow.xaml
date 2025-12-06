@@ -51,21 +51,21 @@
             </StackPanel>
             <Label Grid.Row="2" Grid.Column="0" Content="履歴トークン数" VerticalAlignment="Center" />
             <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical" Margin="0,2,0,2">
-                <Slider Minimum="0" Maximum="128000"
+                <Slider Minimum="0" Maximum="128000" TickFrequency="1000"
                         Value="{Binding HistoryTokenBudget, Mode=TwoWay}"
                         IsSnapToTickEnabled="True"/>
                 <TextBlock Text="{Binding HistoryTokenBudget}" HorizontalAlignment="Right" />
             </StackPanel>
             <Label Grid.Row="3" Grid.Column="0" Content="参照文書トークン数" VerticalAlignment="Center" />
             <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Vertical" Margin="0,2,0,2">
-                <Slider Minimum="0" Maximum="128000"
+                <Slider Minimum="0" Maximum="128000" TickFrequency="1000"
                         Value="{Binding DocumentTokenBudget, Mode=TwoWay}"
                         IsSnapToTickEnabled="True"/>
                 <TextBlock Text="{Binding DocumentTokenBudget}" HorizontalAlignment="Right" />
             </StackPanel>
             <Label Grid.Row="4" Grid.Column="0" Content="回答トークン数" VerticalAlignment="Center" />
             <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Vertical" Margin="0,2,0,2">
-                <Slider Minimum="0" Maximum="128000"
+                <Slider Minimum="0" Maximum="4096" TickFrequency="128"
                         Value="{Binding AnswerTokenBudget, Mode=TwoWay}"
                         IsSnapToTickEnabled="True"/>
                 <TextBlock Text="{Binding AnswerTokenBudget}" HorizontalAlignment="Right" />
