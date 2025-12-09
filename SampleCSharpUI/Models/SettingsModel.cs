@@ -91,7 +91,11 @@ namespace SampleCSharpUI.Models
         /// </summary>
         internal async Task SaveAsync()
         {
-            if (Config.TenantName != this.TenantName || Config.ClientId != this.ClientId)
+            if (Config.TenantName != this.TenantName ||
+                Config.ClientId != this.ClientId ||
+                Config.IsUseOSWebView != this.IsUseOSWebView ||
+                Config.IsPromptAuthentication != this.IsPromptAuthentication ||
+                Config.ClientSecret != this.ClientSecret)
             {
                 // 設定が変更された場合はログアウトする
                 await App.MainVM.DisconnectAsync();

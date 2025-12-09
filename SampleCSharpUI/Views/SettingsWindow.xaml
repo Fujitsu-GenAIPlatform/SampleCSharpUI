@@ -25,26 +25,30 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid>
+        <Grid Margin="4,0,4,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="110" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="42" />
                 <RowDefinition Height="42" />
                 <RowDefinition Height="42" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="42" />
+                <RowDefinition Height="42" />
                 <RowDefinition Height="42" />
             </Grid.RowDefinitions>
-            <RadioButton Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="対話認証" IsChecked="{Binding IsPromptAuthentication, Mode=TwoWay}" GroupName="Authentication" Margin="0,4,0,0" />
-            <Label Grid.Row="1" Grid.Column="0" Content="TenantName" VerticalAlignment="Center" Margin="10,0,0,0" />
-            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding TenantName, Mode=TwoWay}" Height="34" VerticalContentAlignment="Center" Margin="0,2,0,2"/>
-            <Label Grid.Row="2" Grid.Column="0" Content="ClientId" VerticalAlignment="Center" Margin="10,0,0,0" />
-            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ClientId, Mode=TwoWay}" Height="34" VerticalContentAlignment="Center" Margin="0,2,0,2" />
-            <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="(高度なオプション) アプリ組込のユーザ認証画面が動作しないため、OS規定ブラウザを使用する" IsChecked="{Binding IsUseOSWebView, Mode=TwoWay}" VerticalAlignment="Center" Margin="10,0,0,0" />
-            <RadioButton Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="非対話認証" IsChecked="{Binding IsPromptAuthentication, Converter={StaticResource NegativeConverter}, Mode=OneWay}" GroupName="Authentication" Margin="0,10,0,0"/>
+            <Label Grid.Row="0" Grid.Column="0" Content="TenantName" VerticalAlignment="Center" Margin="0,0,0,0" />
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding TenantName, Mode=TwoWay}" Height="34" VerticalContentAlignment="Center" Margin="0,2,0,2"/>
+            <Label Grid.Row="1" Grid.Column="0" Content="ClientId" VerticalAlignment="Center" Margin="0,0,0,0" />
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ClientId, Mode=TwoWay}" Height="34" VerticalContentAlignment="Center" Margin="0,2,0,2" />
+            <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="(高度なオプション) アプリ組込のユーザ認証画面が動作しないため、OS規定ブラウザを使用する" IsChecked="{Binding IsUseOSWebView, Mode=TwoWay}" VerticalAlignment="Center" Margin="4,0,0,0" />
+            <Label Grid.Row="3" Grid.Column="0" Content="認証方式" VerticalAlignment="Center" Margin="0,0,0,0" />
+            <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <RadioButton Content="対話認証" IsChecked="{Binding IsPromptAuthentication, Mode=TwoWay}" GroupName="Authentication" Margin="4,0,4,0" />
+                <RadioButton Content="非対話認証" IsChecked="{Binding IsPromptAuthentication, Converter={StaticResource NegativeConverter}, Mode=OneWay}" GroupName="Authentication" Margin="4,0,4,0"/>
+            </StackPanel>
+            <Label Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="非対話認証" VerticalAlignment="Center" Margin="0,0,0,0"/>
             <Label Grid.Row="5" Grid.Column="0" Content="ClientSecret" VerticalAlignment="Center" Margin="10,0,0,0" />
             <PasswordBox Grid.Row="5" Grid.Column="1" Common:PasswordBoxHelper.Password="{Binding ClientSecret, Mode=TwoWay}" Height="34" VerticalContentAlignment="Center" Margin="0,2,0,2" />
         </Grid>
