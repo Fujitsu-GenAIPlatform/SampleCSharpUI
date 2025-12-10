@@ -10,7 +10,7 @@
         mc:Ignorable="d"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         FontFamily="Meiryo UI"
-        Title="RAG管理"
+        Title="{x:Static prop:Resources.DisplayReference}"
         Width="550" Height="800"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False" WindowStyle="SingleBorderWindow"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}"
@@ -56,7 +56,7 @@
         </ListBox>
 
         <StackPanel Grid.Row="1" Margin="4,10,4,4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Close" Margin="5,0,0,0" Width="88" Height="27"
+            <Button Content="{x:Static prop:Resources.Close}" Margin="5,0,0,0" Width="88" Height="27"
                     FontWeight="Bold" FontSize="14" Background="White">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Click">

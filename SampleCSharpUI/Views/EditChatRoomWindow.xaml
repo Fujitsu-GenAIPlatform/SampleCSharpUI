@@ -11,7 +11,7 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:ia="http://schemas.microsoft.com/xaml/behaviors"
         FontFamily="Meiryo UI"
-        Title="ルーム編集"
+        Title="{x:Static prop:Resources.EditChatRoom}"
         SizeToContent="Height" Width="550"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False" WindowStyle="SingleBorderWindow" ResizeMode="NoResize"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}"
@@ -39,9 +39,9 @@
                 <RowDefinition Height="42" />
                 <RowDefinition Height="42" />
             </Grid.RowDefinitions>
-            <Label Grid.Row="0" Grid.Column="0" Content="ルーム名" VerticalAlignment="Center" />
+            <Label Grid.Row="0" Grid.Column="0" Content="{x:Static prop:Resources.ChatRoomName}" VerticalAlignment="Center" />
             <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ChatRoomName, Mode=TwoWay}" Height="34" VerticalContentAlignment="Center" Margin="0,2,0,2"/>
-            <Label Grid.Row="1" Grid.Column="0" Content="ランダム性" VerticalAlignment="Center" />
+            <Label Grid.Row="1" Grid.Column="0" Content="{x:Static prop:Resources.Temperature}" VerticalAlignment="Center" />
             <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Margin="0,2,0,2">
                 <Slider Minimum="0" Maximum="1"
                         Value="{Binding Temperature, Mode=TwoWay}"
@@ -49,28 +49,28 @@
                         IsSnapToTickEnabled="True"/>
                 <TextBlock Text="{Binding Temperature, StringFormat='{}{0:0.0}'}" HorizontalAlignment="Right" />
             </StackPanel>
-            <Label Grid.Row="2" Grid.Column="0" Content="履歴トークン数" VerticalAlignment="Center" />
+            <Label Grid.Row="2" Grid.Column="0" Content="{x:Static prop:Resources.HistoryTokenBudget}" VerticalAlignment="Center" />
             <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical" Margin="0,2,0,2">
                 <Slider Minimum="0" Maximum="128000" TickFrequency="1000"
                         Value="{Binding HistoryTokenBudget, Mode=TwoWay}"
                         IsSnapToTickEnabled="True"/>
                 <TextBlock Text="{Binding HistoryTokenBudget}" HorizontalAlignment="Right" />
             </StackPanel>
-            <Label Grid.Row="3" Grid.Column="0" Content="参照文書トークン数" VerticalAlignment="Center" />
+            <Label Grid.Row="3" Grid.Column="0" Content="{x:Static prop:Resources.DocumentTokenBudget}" VerticalAlignment="Center" />
             <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Vertical" Margin="0,2,0,2">
                 <Slider Minimum="0" Maximum="128000" TickFrequency="1000"
                         Value="{Binding DocumentTokenBudget, Mode=TwoWay}"
                         IsSnapToTickEnabled="True"/>
                 <TextBlock Text="{Binding DocumentTokenBudget}" HorizontalAlignment="Right" />
             </StackPanel>
-            <Label Grid.Row="4" Grid.Column="0" Content="回答トークン数" VerticalAlignment="Center" />
+            <Label Grid.Row="4" Grid.Column="0" Content="{x:Static prop:Resources.AnswerTokenBudget}" VerticalAlignment="Center" />
             <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Vertical" Margin="0,2,0,2">
                 <Slider Minimum="0" Maximum="4096" TickFrequency="128"
                         Value="{Binding AnswerTokenBudget, Mode=TwoWay}"
                         IsSnapToTickEnabled="True"/>
                 <TextBlock Text="{Binding AnswerTokenBudget}" HorizontalAlignment="Right" />
             </StackPanel>
-            <Label Grid.Row="5" Grid.Column="0" Content="RAG指定" VerticalAlignment="Center" />
+            <Label Grid.Row="5" Grid.Column="0" Content="{x:Static prop:Resources.SelectedRetriever}" VerticalAlignment="Center" />
             <ComboBox Grid.Row="5" Grid.Column="1" Height="34" VerticalContentAlignment="Center"
                       ItemsSource="{Binding Retrievers}"
                       SelectedItem="{Binding SelectedRetriever, Mode=TwoWay}"
@@ -86,10 +86,10 @@
             </ComboBox>
         </Grid>
         <StackPanel Grid.Row="1" Margin="4,10,4,4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Margin="0,0,5,0" Content="OK" Width="88" Height="27"
+            <Button Margin="0,0,5,0" Content="{x:Static prop:Resources.Save}" Width="88" Height="27"
                     FontWeight="Bold" FontSize="14" Background="White" 
 				    Command="{Binding SaveCommand}"/>
-            <Button Content="Cancel" Margin="5,0,0,0" Width="88" Height="27"
+            <Button Content="{x:Static prop:Resources.Cancel}" Margin="5,0,0,0" Width="88" Height="27"
                     FontWeight="Bold" FontSize="14" Background="White">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Click">

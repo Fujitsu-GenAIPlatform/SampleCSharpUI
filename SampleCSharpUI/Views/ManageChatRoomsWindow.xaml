@@ -10,7 +10,7 @@
         mc:Ignorable="d"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         FontFamily="Meiryo UI"
-        Title="ルーム管理"
+        Title="{x:Static prop:Resources.ManageChatRooms}"
         SizeToContent="Height" Width="550"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False" WindowStyle="SingleBorderWindow" ResizeMode="NoResize"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}"
@@ -61,7 +61,7 @@
                             <ColumnDefinition Width="61" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Name}" />
-                        <Button Grid.Column="1" Content="編集" HorizontalAlignment="Right" Width="56" FontSize="14" FontWeight="Bold" Background="White" 
+                        <Button Grid.Column="1" Content="{x:Static prop:Resources.Edit}" HorizontalAlignment="Right" Width="56" FontSize="14" FontWeight="Bold" Background="White" 
                                 Margin="5,0,0,0">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
@@ -69,7 +69,7 @@
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </Button>
-                        <Button Grid.Column="2" Content="削除" HorizontalAlignment="Right" Width="56" FontSize="14" FontWeight="Bold" Background="White" 
+                        <Button Grid.Column="2" Content="{x:Static prop:Resources.Delete}" HorizontalAlignment="Right" Width="56" FontSize="14" FontWeight="Bold" Background="White" 
                                 Margin="5,0,0,0">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
@@ -83,7 +83,7 @@
         </ListBox>
 
         <StackPanel Grid.Row="1" Margin="4,10,4,4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Close" Margin="5,0,0,0" Width="88" Height="27"
+            <Button Content="{x:Static prop:Resources.Close}" Margin="5,0,0,0" Width="88" Height="27"
                     FontWeight="Bold" FontSize="14" Background="White">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Click">

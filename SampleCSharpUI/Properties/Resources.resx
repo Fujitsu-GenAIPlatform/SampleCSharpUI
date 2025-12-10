@@ -123,4 +123,151 @@
   <data name="OpenSource" xml:space="preserve">
     <value>このアプリケーションは以下のオープンソース成果物を含んでいます。</value>
   </data>
+  <data name="MenuExit" xml:space="preserve">
+    <value>終了(_X)</value>
+  </data>
+  <data name="MenuFile" xml:space="preserve">
+    <value>ファイル(_F)</value>
+  </data>
+  <data name="MenuCreateRetriever" xml:space="preserve">
+    <value>新規作成(_N)...</value>
+  </data>
+  <data name="MenuManageRetrievers" xml:space="preserve">
+    <value>開く(_O)...</value>
+  </data>
+  <data name="MenuConnect" xml:space="preserve">
+    <value>接続(_C)...</value>
+  </data>
+  <data name="MenuDisconnect" xml:space="preserve">
+    <value>切断(_D)</value>
+  </data>
+  <data name="MenuSettings" xml:space="preserve">
+    <value>接続設定(_S)...</value>
+  </data>
+  <data name="MenuCreateChatRoom" xml:space="preserve">
+    <value>新規作成(_N)...</value>
+  </data>
+  <data name="MenuManageChatRooms" xml:space="preserve">
+    <value>管理(_M)...</value>
+  </data>
+  <data name="MenuClearChatRoom" xml:space="preserve">
+    <value>会話をクリア(_C)</value>
+  </data>
+  <data name="MenuHelp" xml:space="preserve">
+    <value>ヘルプ(_H)</value>
+  </data>
+  <data name="MenuChatRoom" xml:space="preserve">
+    <value>ルーム(_R)</value>
+  </data>
+  <data name="EditChatRoomSettings" xml:space="preserve">
+    <value>ルームの設定を変更</value>
+  </data>
+  <data name="DeleteMessage" xml:space="preserve">
+    <value>最新会話を削除</value>
+  </data>
+  <data name="PromptWatermark" xml:space="preserve">
+    <value>ここに質問を入力しEnterキーを押してください。Tips:「なるべく簡素に」、「200文字以内で」のような指示を加えるとAIからの回答が短くなります。</value>
+  </data>
+  <data name="MessagesCount" xml:space="preserve">
+    <value>メッセージ数: {0}</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="TenantName" xml:space="preserve">
+    <value>Tenant Name</value>
+  </data>
+  <data name="ClientId" xml:space="preserve">
+    <value>Client ID</value>
+  </data>
+  <data name="AuthenticationTypePrompt" xml:space="preserve">
+    <value>対話認証</value>
+  </data>
+  <data name="AuthenticationTypeNonPrompt" xml:space="preserve">
+    <value>NonPrompt</value>
+  </data>
+  <data name="UseOSWebView" xml:space="preserve">
+    <value>(高度なオプション) アプリ組込のユーザ認証画面が動作しないため、OS規定ブラウザを使用する</value>
+  </data>
+  <data name="ClientSecret" xml:space="preserve">
+    <value>Client Secret</value>
+  </data>
+  <data name="MenuRAG" xml:space="preserve">
+    <value>RAG(_R)</value>
+  </data>
+  <data name="ManageRetrievers" xml:space="preserve">
+    <value>RAG管理</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>編集</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="AuthenticationType" xml:space="preserve">
+    <value>認証方式</value>
+  </data>
+  <data name="ManageChatRooms" xml:space="preserve">
+    <value>ルーム管理</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="EditRetriever" xml:space="preserve">
+    <value>RAG編集</value>
+  </data>
+  <data name="SelectFolder" xml:space="preserve">
+    <value>フォルダ指定</value>
+  </data>
+  <data name="SelectFile" xml:space="preserve">
+    <value>ファイル指定</value>
+  </data>
+  <data name="SelectUrl" xml:space="preserve">
+    <value>URL指定</value>
+  </data>
+  <data name="RetrieverName" xml:space="preserve">
+    <value>RAG名</value>
+  </data>
+  <data name="EditChatRoom" xml:space="preserve">
+    <value>ルーム編集</value>
+  </data>
+  <data name="ChatRoomName" xml:space="preserve">
+    <value>ルーム名</value>
+  </data>
+  <data name="Temperature" xml:space="preserve">
+    <value>ランダム性</value>
+  </data>
+  <data name="HistoryTokenBudget" xml:space="preserve">
+    <value>履歴トークン数</value>
+  </data>
+  <data name="DocumentTokenBudget" xml:space="preserve">
+    <value>参照文書トークン数</value>
+  </data>
+  <data name="AnswerTokenBudget" xml:space="preserve">
+    <value>回答トークン数</value>
+  </data>
+  <data name="SelectedRetriever" xml:space="preserve">
+    <value>RAG指定</value>
+  </data>
+  <data name="DisplayReference" xml:space="preserve">
+    <value>参照ドキュメント表示</value>
+  </data>
+  <data name="CreateRetriever" xml:space="preserve">
+    <value>新しいRAG</value>
+  </data>
+  <data name="CreateChatRoom" xml:space="preserve">
+    <value>新しいルーム</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>バージョン情報</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
 </root>

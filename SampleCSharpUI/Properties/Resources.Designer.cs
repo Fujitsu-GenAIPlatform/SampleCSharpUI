@@ -19,10 +19,10 @@ namespace SampleCSharpUI.Properties {
     // または Visual Studio のようなツールを使用して自動生成されました。
     // メンバーを追加または削除するには、.ResX ファイルを編集して、/str オプションと共に
     // ResGen を実行し直すか、または VS プロジェクトをビルドし直します。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace SampleCSharpUI.Properties {
         ///   このクラスで使用されているキャッシュされた ResourceManager インスタンスを返します。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SampleCSharpUI.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace SampleCSharpUI.Properties {
         ///   現在のスレッドの CurrentUICulture プロパティをオーバーライドします。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,20 +61,461 @@ namespace SampleCSharpUI.Properties {
         }
         
         /// <summary>
+        ///   バージョン情報 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string About {
+            get {
+                return ResourceManager.GetString("About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   回答トークン数 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string AnswerTokenBudget {
+            get {
+                return ResourceManager.GetString("AnswerTokenBudget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   認証方式 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string AuthenticationType {
+            get {
+                return ResourceManager.GetString("AuthenticationType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   NonPrompt に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string AuthenticationTypeNonPrompt {
+            get {
+                return ResourceManager.GetString("AuthenticationTypeNonPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   対話認証 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string AuthenticationTypePrompt {
+            get {
+                return ResourceManager.GetString("AuthenticationTypePrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cancel に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Cancel {
+            get {
+                return ResourceManager.GetString("Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ルーム名 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ChatRoomName {
+            get {
+                return ResourceManager.GetString("ChatRoomName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Client ID に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ClientId {
+            get {
+                return ResourceManager.GetString("ClientId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Client Secret に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ClientSecret {
+            get {
+                return ResourceManager.GetString("ClientSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Close に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Close {
+            get {
+                return ResourceManager.GetString("Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   新しいルーム に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string CreateChatRoom {
+            get {
+                return ResourceManager.GetString("CreateChatRoom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   新しいRAG に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string CreateRetriever {
+            get {
+                return ResourceManager.GetString("CreateRetriever", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   削除 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Delete {
+            get {
+                return ResourceManager.GetString("Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   最新会話を削除 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string DeleteMessage {
+            get {
+                return ResourceManager.GetString("DeleteMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   参照ドキュメント表示 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string DisplayReference {
+            get {
+                return ResourceManager.GetString("DisplayReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   参照文書トークン数 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string DocumentTokenBudget {
+            get {
+                return ResourceManager.GetString("DocumentTokenBudget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   編集 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Edit {
+            get {
+                return ResourceManager.GetString("Edit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ルーム編集 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string EditChatRoom {
+            get {
+                return ResourceManager.GetString("EditChatRoom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ルームの設定を変更 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string EditChatRoomSettings {
+            get {
+                return ResourceManager.GetString("EditChatRoomSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   RAG編集 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string EditRetriever {
+            get {
+                return ResourceManager.GetString("EditRetriever", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   履歴トークン数 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string HistoryTokenBudget {
+            get {
+                return ResourceManager.GetString("HistoryTokenBudget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ルーム管理 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ManageChatRooms {
+            get {
+                return ResourceManager.GetString("ManageChatRooms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   RAG管理 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ManageRetrievers {
+            get {
+                return ResourceManager.GetString("ManageRetrievers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   バージョン情報(_A) に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        internal static string MenuAbout {
+        public static string MenuAbout {
             get {
                 return ResourceManager.GetString("MenuAbout", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   ルーム(_R) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuChatRoom {
+            get {
+                return ResourceManager.GetString("MenuChatRoom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   会話をクリア(_C) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuClearChatRoom {
+            get {
+                return ResourceManager.GetString("MenuClearChatRoom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   接続(_C)... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuConnect {
+            get {
+                return ResourceManager.GetString("MenuConnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   新規作成(_N)... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuCreateChatRoom {
+            get {
+                return ResourceManager.GetString("MenuCreateChatRoom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   新規作成(_N)... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuCreateRetriever {
+            get {
+                return ResourceManager.GetString("MenuCreateRetriever", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   切断(_D) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuDisconnect {
+            get {
+                return ResourceManager.GetString("MenuDisconnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   終了(_X) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuExit {
+            get {
+                return ResourceManager.GetString("MenuExit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ファイル(_F) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuFile {
+            get {
+                return ResourceManager.GetString("MenuFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ヘルプ(_H) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuHelp {
+            get {
+                return ResourceManager.GetString("MenuHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   管理(_M)... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuManageChatRooms {
+            get {
+                return ResourceManager.GetString("MenuManageChatRooms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   開く(_O)... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuManageRetrievers {
+            get {
+                return ResourceManager.GetString("MenuManageRetrievers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   RAG(_R) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuRAG {
+            get {
+                return ResourceManager.GetString("MenuRAG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   接続設定(_S)... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuSettings {
+            get {
+                return ResourceManager.GetString("MenuSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   メッセージ数: {0} に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MessagesCount {
+            get {
+                return ResourceManager.GetString("MessagesCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   OK に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OK {
+            get {
+                return ResourceManager.GetString("OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   このアプリケーションは以下のオープンソース成果物を含んでいます。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        internal static string OpenSource {
+        public static string OpenSource {
             get {
                 return ResourceManager.GetString("OpenSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ここに質問を入力しEnterキーを押してください。Tips:「なるべく簡素に」、「200文字以内で」のような指示を加えるとAIからの回答が短くなります。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PromptWatermark {
+            get {
+                return ResourceManager.GetString("PromptWatermark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   RAG名 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string RetrieverName {
+            get {
+                return ResourceManager.GetString("RetrieverName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   OK に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   RAG指定 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SelectedRetriever {
+            get {
+                return ResourceManager.GetString("SelectedRetriever", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ファイル指定 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SelectFile {
+            get {
+                return ResourceManager.GetString("SelectFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   フォルダ指定 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SelectFolder {
+            get {
+                return ResourceManager.GetString("SelectFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   URL指定 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SelectUrl {
+            get {
+                return ResourceManager.GetString("SelectUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   設定 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings {
+            get {
+                return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ランダム性 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Temperature {
+            get {
+                return ResourceManager.GetString("Temperature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Tenant Name に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TenantName {
+            get {
+                return ResourceManager.GetString("TenantName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   (高度なオプション) アプリ組込のユーザ認証画面が動作しないため、OS規定ブラウザを使用する に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string UseOSWebView {
+            get {
+                return ResourceManager.GetString("UseOSWebView", resourceCulture);
             }
         }
     }

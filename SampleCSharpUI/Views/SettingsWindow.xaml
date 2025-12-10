@@ -11,7 +11,7 @@
         mc:Ignorable="d"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         FontFamily="Meiryo UI"
-        Title="設定"
+        Title="{x:Static prop:Resources.Settings}"
         SizeToContent="Height" Width="550"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False" WindowStyle="SingleBorderWindow" ResizeMode="NoResize"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}"
@@ -38,25 +38,25 @@
                 <RowDefinition Height="42" />
                 <RowDefinition Height="42" />
             </Grid.RowDefinitions>
-            <Label Grid.Row="0" Grid.Column="0" Content="TenantName" VerticalAlignment="Center" Margin="0,0,0,0" />
+            <Label Grid.Row="0" Grid.Column="0" Content="{x:Static prop:Resources.TenantName}" VerticalAlignment="Center" Margin="0,0,0,0" />
             <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding TenantName, Mode=TwoWay}" Height="34" VerticalContentAlignment="Center" Margin="0,2,0,2"/>
-            <Label Grid.Row="1" Grid.Column="0" Content="ClientId" VerticalAlignment="Center" Margin="0,0,0,0" />
+            <Label Grid.Row="1" Grid.Column="0" Content="{x:Static prop:Resources.ClientId}" VerticalAlignment="Center" Margin="0,0,0,0" />
             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ClientId, Mode=TwoWay}" Height="34" VerticalContentAlignment="Center" Margin="0,2,0,2" />
-            <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="(高度なオプション) アプリ組込のユーザ認証画面が動作しないため、OS規定ブラウザを使用する" IsChecked="{Binding IsUseOSWebView, Mode=TwoWay}" VerticalAlignment="Center" Margin="4,0,0,0" />
-            <Label Grid.Row="3" Grid.Column="0" Content="認証方式" VerticalAlignment="Center" Margin="0,0,0,0" />
+            <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="{x:Static prop:Resources.UseOSWebView}" IsChecked="{Binding IsUseOSWebView, Mode=TwoWay}" VerticalAlignment="Center" Margin="4,0,0,0" />
+            <Label Grid.Row="3" Grid.Column="0" Content="{x:Static prop:Resources.AuthenticationType}" VerticalAlignment="Center" Margin="0,0,0,0" />
             <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                <RadioButton Content="対話認証" IsChecked="{Binding IsPromptAuthentication, Mode=TwoWay}" GroupName="Authentication" Margin="4,0,4,0" />
-                <RadioButton Content="非対話認証" IsChecked="{Binding IsPromptAuthentication, Converter={StaticResource NegativeConverter}, Mode=OneWay}" GroupName="Authentication" Margin="4,0,4,0"/>
+                <RadioButton Content="{x:Static prop:Resources.AuthenticationTypePrompt}" IsChecked="{Binding IsPromptAuthentication, Mode=TwoWay}" GroupName="Authentication" Margin="4,0,4,0" />
+                <RadioButton Content="{x:Static prop:Resources.AuthenticationTypeNonPrompt}" IsChecked="{Binding IsPromptAuthentication, Converter={StaticResource NegativeConverter}, Mode=OneWay}" GroupName="Authentication" Margin="4,0,4,0"/>
             </StackPanel>
-            <Label Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="非対話認証" VerticalAlignment="Center" Margin="0,0,0,0"/>
-            <Label Grid.Row="5" Grid.Column="0" Content="ClientSecret" VerticalAlignment="Center" Margin="10,0,0,0" />
+            <Label Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="{x:Static prop:Resources.AuthenticationTypeNonPrompt}" VerticalAlignment="Center" Margin="0,0,0,0"/>
+            <Label Grid.Row="5" Grid.Column="0" Content="{x:Static prop:Resources.ClientSecret}" VerticalAlignment="Center" Margin="10,0,0,0" />
             <PasswordBox Grid.Row="5" Grid.Column="1" Common:PasswordBoxHelper.Password="{Binding ClientSecret, Mode=TwoWay}" Height="34" VerticalContentAlignment="Center" Margin="0,2,0,2" />
         </Grid>
         <StackPanel Grid.Row="1" Margin="4,10,4,4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Margin="0,0,5,0" Content="OK" Width="88" Height="27"
+            <Button Margin="0,0,5,0" Content="{x:Static prop:Resources.Save}" Width="88" Height="27"
                     FontWeight="Bold" FontSize="14" Background="White" 
 				    Command="{Binding SaveCommand}"/>
-            <Button Content="Cancel" Margin="5,0,0,0" Width="88" Height="27"
+            <Button Content="{x:Static prop:Resources.Cancel}" Margin="5,0,0,0" Width="88" Height="27"
                     FontWeight="Bold" FontSize="14" Background="White">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Click">

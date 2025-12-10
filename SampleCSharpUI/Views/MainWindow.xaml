@@ -95,7 +95,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Margin="4,0,8,0" HorizontalAlignment="Left" ToolTip="ルームの設定を変更" Background="#FF707070" IsEnabled="{Binding IsBusy, Converter={StaticResource NegativeConverter}}">
+            <Button Grid.Column="0" Margin="4,0,8,0" HorizontalAlignment="Left" ToolTip="{x:Static prop:Resources.EditChatRoomSettings}" Background="#FF707070" IsEnabled="{Binding IsBusy, Converter={StaticResource NegativeConverter}}">
                 <Grid>
                     <Image Panel.ZIndex="1" Source="/Images/Settings.png"
                            Stretch="UniformToFill"
@@ -107,8 +107,8 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Button>
-            <TextBlock Grid.Column="2"  VerticalAlignment="Center" Opacity="0.6" Text="{Binding Messages.Count, StringFormat='メッセージ数: {0}'}" />
-            <Button Grid.Column="3" Margin="4,0,4,0" ToolTip="最新会話を削除" Background="#FF707070" IsEnabled="{Binding IsBusy, Converter={StaticResource NegativeConverter}}">
+            <TextBlock Grid.Column="2"  VerticalAlignment="Center" Opacity="0.6" Text="{Binding Messages.Count, StringFormat='{x:Static prop:Resources.MessagesCount}'}" />
+            <Button Grid.Column="3" Margin="4,0,4,0" ToolTip="{x:Static prop:Resources.DeleteMessage}" Background="#FF707070" IsEnabled="{Binding IsBusy, Converter={StaticResource NegativeConverter}}">
                 <Grid>
                     <Image Panel.ZIndex="1" Source="/Images/Trash.png"
                            Stretch="UniformToFill"
@@ -134,7 +134,7 @@
 
         <Grid VerticalAlignment="Bottom" Grid.Row="4" Background="#FF707070" IsEnabled="{Binding IsLogin, Mode=OneWay}">
             <Grid  Margin="25,9,25,9">
-                <TextBlock Text="ここに質問を入力しEnterキーを押してください。Tips:「なるべく簡素に」、「200文字以内で」のような指示を加えるとAIからの回答が短くなります。"
+                <TextBlock Text="{x:Static prop:Resources.PromptWatermark}"
                            Padding="5,5,0,5" VerticalAlignment="Top" IsHitTestVisible="False" Background="White">
                 </TextBlock>
                 <TextBox Height="Auto" Padding="0,5,0,5"
@@ -177,17 +177,17 @@
                         <DockPanel />
                     </ItemsPanelTemplate>
                 </Menu.ItemsPanel>
-                <MenuItem Header="ファイル(_F)">
-                    <MenuItem Header="RAG(_R)" IsEnabled="{Binding IsLogin}">
-                        <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="CreateRetriever" Header="新規作成(_N)..." />
-                        <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="ManageRetrievers" Header="開く(_O)..." />
+                <MenuItem Header="{x:Static prop:Resources.MenuFile}">
+                    <MenuItem Header="{x:Static prop:Resources.MenuRAG}" IsEnabled="{Binding IsLogin}">
+                        <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="CreateRetriever" Header="{x:Static prop:Resources.MenuCreateRetriever}" />
+                        <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="ManageRetrievers" Header="{x:Static prop:Resources.MenuManageRetrievers}" />
                     </MenuItem>
                     <Separator />
-                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="Connect" Header="接続(_C)..." Visibility="{Binding IsLogin, Converter={StaticResource Boolean2CollapsedConverter}}" IsEnabled="{Binding IsSettings}" />
-                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="Disconnect" Header="切断(_D)" Visibility="{Binding IsLogin, Converter={StaticResource Boolean2VisibilityConverter}}" />
-                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="Settings" Header="接続設定(_S)..." />
+                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="Connect" Header="{x:Static prop:Resources.MenuConnect}" Visibility="{Binding IsLogin, Converter={StaticResource Boolean2CollapsedConverter}}" IsEnabled="{Binding IsSettings}" />
+                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="Disconnect" Header="{x:Static prop:Resources.MenuDisconnect}" Visibility="{Binding IsLogin, Converter={StaticResource Boolean2VisibilityConverter}}" />
+                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="Settings" Header="{x:Static prop:Resources.MenuSettings}" />
                     <Separator />
-                    <MenuItem Header="終了(_X)">
+                    <MenuItem Header="{x:Static prop:Resources.MenuCreateRetriever}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Click">
                                 <i:CallMethodAction TargetObject="{Binding ElementName=window}" MethodName="Close" />
@@ -195,11 +195,11 @@
                         </i:Interaction.Triggers>
                     </MenuItem>
                 </MenuItem>
-                <MenuItem Header="ルーム(_R)" IsEnabled="{Binding IsLogin}">
-                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="CreateChatRoom" Header="新規作成(_N)..." />
-                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="ManageChatRooms" Header="管理(_M)..." />
+                <MenuItem Header="{x:Static prop:Resources.MenuChatRoom}" IsEnabled="{Binding IsLogin}">
+                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="CreateChatRoom" Header="{x:Static prop:Resources.MenuCreateChatRoom}" />
+                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="ManageChatRooms" Header="{x:Static prop:Resources.MenuManageChatRooms}" />
                     <Separator />
-                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="ClearChatRoom" Header="会話をクリア(_C)" />
+                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="ClearChatRoom" Header="{x:Static prop:Resources.MenuClearChatRoom}" />
                 </MenuItem>
                 <ComboBox Foreground="Black" 
                           ItemsSource="{Binding ChatRooms}" 
@@ -212,8 +212,8 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-                <MenuItem Header="ヘルプ(_H)">
-                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="About" Header="バージョン情報(_A)" />
+                <MenuItem Header="{x:Static prop:Resources.MenuHelp}">
+                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="About" Header="{x:Static prop:Resources.MenuAbout}" />
                 </MenuItem>
                 <MenuItem Header="{Binding UserName}" DockPanel.Dock="Right" HorizontalAlignment="Right" IsHitTestVisible="False" Margin="0,0,20,0" />
             </Menu>

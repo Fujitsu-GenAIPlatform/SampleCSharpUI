@@ -47,7 +47,7 @@
                             <TextBox Text="{Binding Content, Mode=OneWay}" TextWrapping="Wrap" IsReadOnly="True" BorderThickness="0" Background="Transparent" />
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <TextBlock Padding="0" Opacity="0.6" Text="{Binding Time, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" />
-                                <Button Margin="4,0,4,0" ToolTip="参照ドキュメント表示" Background="Gray">
+                                <Button Margin="4,0,4,0" ToolTip="{x:Static prop:Resources.DisplayReference}" Background="Gray">
                                     <Grid>
                                         <Image Panel.ZIndex="1" Source="/Images/Detail.png"
                                                Stretch="UniformToFill"
