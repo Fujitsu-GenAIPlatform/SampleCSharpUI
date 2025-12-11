@@ -178,5 +178,31 @@ namespace SampleCSharpUI.Commons
             [DataMember]
             public string target_storage { get; set; }
         }
+
+        [DataContract]
+        public class TNonRoomRequest
+        {
+            [DataMember]
+            public TChatMessage[] messages { get; set; }
+            [DataMember]
+            public string question { get; set; }
+            [DataMember]
+            public string model { get; set; }
+            [DataMember]
+            public int max_tokens { get; set; }
+            [DataMember]
+            public float temperature { get; set; }
+            [DataMember]
+            public int top_p { get; set; }
+        }
+
+        [DataContract]
+        public class TNonRoomResponse
+        {
+            [DataMember]
+            public string answer { get; set; }
+            [DataMember]
+            public TChatMessage[] messages { get; set; }
+        }
     }
 }

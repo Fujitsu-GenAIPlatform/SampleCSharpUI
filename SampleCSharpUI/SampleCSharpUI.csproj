@@ -158,6 +158,7 @@
     <Compile Include="Converters\DoubleToGridLengthConverter.cs" />
     <Compile Include="Converters\Long2LocalDateTimeConverter.cs" />
     <Compile Include="Converters\NegativeConverter.cs" />
+    <Compile Include="Converters\Null2FalseConverter.cs" />
     <Compile Include="Converters\RoleToHorizontalAlignmentConverter.cs" />
     <Compile Include="Converters\WidthPercentageConverter.cs" />
     <Compile Include="Models\ChatRoomModel.cs" />

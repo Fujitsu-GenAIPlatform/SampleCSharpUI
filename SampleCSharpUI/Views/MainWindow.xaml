@@ -18,6 +18,7 @@
         <converter:NegativeConverter x:Key="NegativeConverter"/>
         <converter:Boolean2CollapsedConverter x:Key="Boolean2CollapsedConverter"/>
         <converter:Boolean2VisibilityConverter x:Key="Boolean2VisibilityConverter"/>
+        <converter:Null2FalseConverter x:Key="Null2FalseConverter"/>
     </Window.Resources>
 
     <Grid>
@@ -95,7 +96,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Margin="4,0,8,0" HorizontalAlignment="Left" ToolTip="{x:Static prop:Resources.EditChatRoomSettings}" Background="#FF707070" IsEnabled="{Binding IsBusy, Converter={StaticResource NegativeConverter}}">
+            <Button Grid.Column="0" Margin="4,0,8,0" HorizontalAlignment="Left" ToolTip="{x:Static prop:Resources.EditChatRoomSettings}" Background="#FF707070">
                 <Grid>
                     <Image Panel.ZIndex="1" Source="/Images/Settings.png"
                            Stretch="UniformToFill"
@@ -106,6 +107,20 @@
                         <i:InvokeCommandAction Command="{Binding ShowDialogCommand}" CommandParameter="EditChatRoomSettings"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="IsEnabled" Value="False"/>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsBusy, Mode=OneWay, Converter={StaticResource NegativeConverter}}" Value="True"/>
+                                    <Condition Binding="{Binding SelectedChatRoom.ID, Mode=OneWay, Converter={StaticResource Null2FalseConverter}}" Value="True"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="IsEnabled" Value="True"/>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
             </Button>
             <TextBlock Grid.Column="2"  VerticalAlignment="Center" Opacity="0.6" Text="{Binding Messages.Count, StringFormat='{x:Static prop:Resources.MessagesCount}'}" />
             <Button Grid.Column="3" Margin="4,0,4,0" ToolTip="{x:Static prop:Resources.DeleteMessage}" Background="#FF707070" IsEnabled="{Binding IsBusy, Converter={StaticResource NegativeConverter}}">
@@ -195,11 +210,26 @@
                         </i:Interaction.Triggers>
                     </MenuItem>
                 </MenuItem>
-                <MenuItem Header="{x:Static prop:Resources.MenuChatRoom}" IsEnabled="{Binding IsLogin}">
-                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="CreateChatRoom" Header="{x:Static prop:Resources.MenuCreateChatRoom}" />
+                <MenuItem Header="{x:Static prop:Resources.MenuChatRoom}">
+                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="CreateChatRoom" Header="{x:Static prop:Resources.MenuCreateChatRoom}"/>
                     <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="ManageChatRooms" Header="{x:Static prop:Resources.MenuManageChatRooms}" />
                     <Separator />
                     <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="ClearChatRoom" Header="{x:Static prop:Resources.MenuClearChatRoom}" />
+                    <MenuItem.Style>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="IsEnabled" Value="False"/>
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsLogin, Mode=OneWay}" Value="True"/>
+                                        <Condition Binding="{Binding IsBusy, Mode=OneWay, Converter={StaticResource NegativeConverter}}" Value="True"/>
+                                        <Condition Binding="{Binding SelectedChatRoom.ID, Mode=OneWay, Converter={StaticResource Null2FalseConverter}}" Value="True"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="IsEnabled" Value="True"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </MenuItem.Style>
                 </MenuItem>
                 <ComboBox Foreground="Black" 
                           ItemsSource="{Binding ChatRooms}" 

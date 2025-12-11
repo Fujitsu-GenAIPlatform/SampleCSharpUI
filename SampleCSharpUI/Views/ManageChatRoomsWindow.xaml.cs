@@ -32,6 +32,21 @@ namespace SampleCSharpUI.Views
                 this.ViewModel.IsBusy = false;
             };
 
+            this.Unloaded += async (s, e) =>
+            {
+                this.ViewModel.IsBusy = true;
+                try
+                {
+                    await App.MainVM.GetChatRoomsAsync(true);
+                }
+                catch (Exception ex)
+                {
+                    // ViewModelの処理で例外が発生した場合はここでキャッチしてメッセージ表示
+                    MessageBox.Show(this.Owner, ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                }
+                this.ViewModel.IsBusy = false;
+            };
+
             this.ViewModel.Messaged += async (s, e) =>
             {
                 this.ViewModel.IsBusy = true;

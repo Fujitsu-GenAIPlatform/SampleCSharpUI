@@ -195,9 +195,9 @@ namespace SampleCSharpUI.ViewModels
         /// ルーム一覧取得
         /// </summary>
         /// <returns></returns>
-        internal async Task GetChatRoomsAsync()
+        internal async Task GetChatRoomsAsync(bool isUseNone = false)
         {
-            await this.Model.GetChatRoomsAsync();
+            await this.Model.GetChatRoomsAsync(isUseNone);
         }
 
         /// <summary>
@@ -317,7 +317,14 @@ namespace SampleCSharpUI.ViewModels
                                     // メッセージを追加（ここではローカルに追加するのみ）
                                     var content = this.InputText.Trim();
                                     this.InputText = string.Empty;
-                                    await this.Model.SendMessageAsync(content);
+                                    if (!string.IsNullOrEmpty(this.SelectedChatRoom.ID))
+                                    {
+                                        await this.Model.SendMessageAsync(this.SelectedChatRoom.ID, content);
+                                    }
+                                    else
+                                    {
+                                        await this.Model.SendMessageAsync(this.Messages.ToList(), (float)0.5, 1024, content);
+                                    }
                                 }
                                 catch (Exception ex)
                                 {

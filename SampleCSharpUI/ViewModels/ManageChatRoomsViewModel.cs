@@ -236,43 +236,6 @@ namespace SampleCSharpUI.ViewModels
             await App.MainVM.GetChatRoomsAsync();
         }
 
-
-        /// <summary>
-        /// 設定保存
-        /// </summary>
-        RelayCommand _SaveCommand;
-        public RelayCommand SaveCommand
-        {
-            get
-            {
-                if (_SaveCommand == null)
-                {
-                    _SaveCommand = new RelayCommand(async () =>
-                    {
-                        this.IsBusy = true;
-                        try
-                        {
-                            await this.Model.SetChatRoomAsync(this.SelectedRetriever?.ID);
-                            OnMessaged("");
-                        }
-                        catch (Exception ex)
-                        {
-                            OnMessaged(ex.Message);
-                        }
-                        finally
-                        {
-                            this.IsBusy = false;
-                        }
-                    });
-                }
-                return _SaveCommand;
-            }
-            set
-            {
-                _SaveCommand = value;
-            }
-        }
-
         /// <summary>
         /// ダイアログ表示用イベント
         /// </summary>

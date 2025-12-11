@@ -12,6 +12,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Threading;
 using static SampleCSharpUI.Commons.APIData;
 
@@ -99,7 +100,7 @@ namespace SampleCSharpUI.Models
             this.IsLogin = !string.IsNullOrEmpty(this.IdToken);
 
             // チャットルーム一覧取得
-            await GetChatRoomsAsync();
+            await GetChatRoomsAsync(true);
         }
 
         /// <summary>
@@ -185,33 +186,45 @@ namespace SampleCSharpUI.Models
         }
 
         // チャットルーム一覧取得処理
-        internal async Task GetChatRoomsAsync()
+        internal async Task GetChatRoomsAsync(bool isUseNone = false)
         {
             const string defaultChatRoomName = "General Use";
             var defaultChatRoomID = string.Empty;
 
+            // API呼び出し
+            var jsonString = await HttpHelper.GetRequestAsync("/api/v1/chats", this.IdToken);
+
             // 一覧取得
             this.ChatRooms.Clear();
+
+            // ルームなしの選択を作成
+            if (isUseNone)
             {
-                var jsonString = await HttpHelper.GetRequestAsync("/api/v1/chats", this.IdToken);
-                using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+                this.ChatRooms.Add(new Models.TDataChatRoom()
                 {
-                    var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(List<APIData.TChat>));
+                    ID = string.Empty,
+                    Name = "(none)"
+                });
+            }
+
+            // JSONデシリアライズ
+            using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+            {
+                var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(List<APIData.TChat>));
+                {
+                    var result = ser.ReadObject(json) as List<APIData.TChat>;
+                    foreach (var chat in result)
                     {
-                        var result = ser.ReadObject(json) as List<APIData.TChat>;
-                        foreach (var chat in result)
+                        var chatRoom = new Models.TDataChatRoom()
                         {
-                            var chatRoom = new Models.TDataChatRoom()
-                            {
-                                ID = chat.id,
-                                Name = chat.name,
-                                ChatTemplateId = chat.chat_template_id,
-                                RetrieverIDs = chat.retriever_ids,
-                            };
-                            this.ChatRooms.Add(chatRoom);
-                        }
-                        json.Close();
+                            ID = chat.id,
+                            Name = chat.name,
+                            ChatTemplateId = chat.chat_template_id,
+                            RetrieverIDs = chat.retriever_ids,
+                        };
+                        this.ChatRooms.Add(chatRoom);
                     }
+                    json.Close();
                 }
             }
 
@@ -230,16 +243,25 @@ namespace SampleCSharpUI.Models
             // 保存したChatRoomIDのチャットがあれば選択、無ければ「General Use」を選択
             if (this.ChatRooms.Count > 0)
             {
-                var savedChatRoomID = this.ChatRooms.FirstOrDefault((x) => x.ID == Config.SelectedChatRoomID)?.ID;
-                if (!string.IsNullOrEmpty(savedChatRoomID))
+                if (!string.IsNullOrEmpty(Config.SelectedChatRoomID))
                 {
-                    this.SelectedChatRoom = this.ChatRooms.FirstOrDefault((x) => x.ID == savedChatRoomID);
+                    var savedChatRoomID = this.ChatRooms.FirstOrDefault((x) => x.ID == Config.SelectedChatRoomID)?.ID;
+                    if (!string.IsNullOrEmpty(savedChatRoomID))
+                    {
+                        // 保存したChatRoomIDのチャットを選択
+                        this.SelectedChatRoom = this.ChatRooms.FirstOrDefault((x) => x.ID == savedChatRoomID);
+                    }
+                    else
+                    {
+                        // Name が defaultChatRoomID の最初の要素を取得し、なければ先頭要素を選択する
+                        var target = this.ChatRooms.FirstOrDefault((x) => x.ID == defaultChatRoomID);
+                        this.SelectedChatRoom = target ?? this.ChatRooms[0];
+                    }
                 }
-                else
+                else if (isUseNone)
                 {
-                    // Name が defaultChatRoomID の最初の要素を取得し、なければ先頭要素を選択する
-                    var target = this.ChatRooms.FirstOrDefault((x) => x.ID == defaultChatRoomID);
-                    this.SelectedChatRoom = target ?? this.ChatRooms[0];
+                    // ルームなしチャットを選択
+                    this.SelectedChatRoom = this.ChatRooms[0];
                 }
             }
         }
@@ -247,8 +269,8 @@ namespace SampleCSharpUI.Models
         /// <summary>
         /// チャットルーム作成処理
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="retrieverID"></param>
+        /// <param name="name">ルーム名</param>
+        /// <param name="retrieverID">リトリーバID</param>
         /// <returns></returns>
         internal async Task<string> CreateChatRoomAsync(string name, string retrieverID)
         {
@@ -317,7 +339,7 @@ namespace SampleCSharpUI.Models
         /// <summary>
         /// 会話一覧取得処理 
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">ルームID</param>
         /// <returns></returns>
         internal async Task GetChatsAsync(string id)
         {
@@ -338,7 +360,7 @@ namespace SampleCSharpUI.Models
                                 Role = item.role,
                                 Content = item.content,
                                 Time = DateTimeOffset.FromUnixTimeMilliseconds(item.timeunix).ToLocalTime().DateTime,
-                                Refs = item.ref_chunks is null ? new List<string>() : item.ref_chunks?.Select((x) => x.text.Replace("\n\n","\n")).ToList(),
+                                Refs = item.ref_chunks is null ? new List<string>() : item.ref_chunks?.Select((x) => x.text.Replace("\n\n", "\n")).ToList(),
                             };
                             message.PropertyChanged += (s, e) => { OnPropertyChanged("Messages_Item"); };
                             this.Messages.Add(message);
@@ -355,7 +377,7 @@ namespace SampleCSharpUI.Models
         /// <summary>
         /// チャットルーム内会話クリア処理 
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">ルームID</param>
         /// <returns></returns>
         internal async Task ClearChatRoomAsync(string id)
         {
@@ -392,8 +414,9 @@ namespace SampleCSharpUI.Models
         /// <summary>
         /// プロンプト入力
         /// </summary>
-        /// <param name="inputText"></param>
-        internal async Task SendMessageAsync(string inputText)
+        /// <param name="id">ルームID</param>
+        /// <param name="inputText">入力</param>
+        internal async Task SendMessageAsync(string id, string inputText)
         {
             var content = inputText ?? string.Empty;
             if (!string.IsNullOrWhiteSpace(content))
@@ -411,7 +434,7 @@ namespace SampleCSharpUI.Models
                     {
                         serializer.WriteObject(ms, body);
                         var bodyJsonString = Encoding.UTF8.GetString(ms.ToArray());
-                        var jsonString = await HttpHelper.PostRequestAsync($"/api/v1/chats/{this.SelectedChatRoom.ID}/messages", this.IdToken, bodyJsonString);
+                        var jsonString = await HttpHelper.PostRequestAsync($"/api/v1/chats/{id}/messages", this.IdToken, bodyJsonString);
                         using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
                         {
                             var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChatMessage));
@@ -434,7 +457,7 @@ namespace SampleCSharpUI.Models
                         }
 
                         // AIからの回答取得
-                        jsonString = await HttpHelper.PostRequestAsync($"/api/v1/chats/{this.SelectedChatRoom.ID}/messages/createNextAiMessage", this.IdToken, "{}");
+                        jsonString = await HttpHelper.PostRequestAsync($"/api/v1/chats/{id}/messages/createNextAiMessage", this.IdToken, "{}");
                         using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
                         {
                             var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChatMessage));
@@ -461,19 +484,106 @@ namespace SampleCSharpUI.Models
         }
 
         /// <summary>
-        /// 最新の入力プロンプトまでを削除する（AI空の回答がある場合は、その回答まで削除する
+        /// プロンプト入力(チャットルームなし)
+        /// </summary>
+        /// <param name="inputText">入力</param>
+        internal async Task SendMessageAsync(List<TMessage> histories, float temperature, int token, string inputText)
+        {
+            var content = inputText ?? string.Empty;
+            if (!string.IsNullOrWhiteSpace(content))
+            {
+                var body = new APIData.TNonRoomRequest()
+                {
+                    messages = this.SetHistories(histories),
+                    question = content,
+                    model = "cohere.command-r-plus-fujitsu",
+                    max_tokens = token,
+                    temperature = temperature,
+                    top_p = 1,
+                };
+
+                // 質問のメッセージ追加
+                this.SetMessage("user", content, DateTime.UtcNow.ToLocalTime(), new List<string>());
+
+                // ここで body を JSON 文字列にシリアライズして変数に格納する
+                using (var ms = new MemoryStream())
+                {
+                    var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TNonRoomRequest));
+                    {
+                        serializer.WriteObject(ms, body);
+                        var bodyJsonString = Encoding.UTF8.GetString(ms.ToArray());
+                        var jsonString = await HttpHelper.PostRequestAsync($"/api/v1/action/defined/text:simple_chat/call", this.IdToken, bodyJsonString);
+                        using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+                        {
+                            var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TNonRoomResponse));
+                            {
+                                // 回答のメッセージ追加
+                                var item = ser.ReadObject(json) as APIData.TNonRoomResponse;
+                                this.SetMessage("ai",item.answer, DateTime.UtcNow.ToLocalTime(), new List<string>());
+                            }
+                            json.Close();
+
+                            // 最新行表示
+                            OnPropertyChanged("Messages_Item");
+                        }
+                    }
+                }
+            }
+        }
+
+        // 履歴設定(チャットルームなし)
+        private APIData.TChatMessage[] SetHistories(List<TMessage> histories)
+        {
+            if (histories == null || histories.Count == 0)
+            {
+                return new APIData.TChatMessage[] { };
+            }
+            else
+            {
+                var messages = new APIData.TChatMessage[histories.Count];
+                for (int i = 0; i < histories.Count; i++)
+                {
+                    var history = histories[i];
+                    messages[i] = new APIData.TChatMessage()
+                    {
+                        role = history.Role,
+                        content = history.Content,
+                        timeunix = new DateTimeOffset(history.Time).ToUnixTimeMilliseconds(),
+                        ref_chunks = history.Refs.Select((x) => new APIData.TRefChunks() { text = x }).ToArray(),
+                    };
+                }
+                return messages;
+            }
+        }
+
+        // メッセージ追加(チャットルームなし)
+        private void SetMessage(string role, string content, DateTime time, List<string> refs)
+        {
+            var msg = new TMessage()
+            {
+                Role = role,
+                Content = content,
+                Time = time,
+                Refs = refs
+            };
+            msg.PropertyChanged += (s, e) => { OnPropertyChanged("Messages_Item"); };
+            this.Messages.Add(msg);
+        }
+
+        /// <summary>
+        /// 最新の入力プロンプトまでを削除する（AIからの回答がある場合は、その回答まで削除する
         /// </summary>
         /// <returns>最新の入力プロンプト</returns>
         internal async Task<string> DeleteMessageAsync()
         {
-            var promptText = string.Empty;  
+            var promptText = string.Empty;
             var lastUserMessageIndex = -1;
             for (var index = this.Messages.Count - 1; index >= 0; index--)
             {
                 if (this.Messages[index].Role == "user")
                 {
                     lastUserMessageIndex = index;
-                    promptText = this.Messages[index].Content;  
+                    promptText = this.Messages[index].Content;
                     break;
                 }
             }
@@ -483,7 +593,11 @@ namespace SampleCSharpUI.Models
                 var messagesToDelete = this.Messages.Count - lastUserMessageIndex;
                 for (int i = 0; i < messagesToDelete; i++)
                 {
-                    var jsonString = await HttpHelper.PostRequestAsync($"/api/v1/chats/{this.SelectedChatRoom.ID}/messages/removeLastMessage", this.IdToken, string.Empty);
+                    if (!string.IsNullOrEmpty(this.SelectedChatRoom.ID))
+                    {
+                        // チャットルームありのときはAPI呼び出しで削除
+                        var jsonString = await HttpHelper.PostRequestAsync($"/api/v1/chats/{this.SelectedChatRoom.ID}/messages/removeLastMessage", this.IdToken, string.Empty);
+                    }
                     this.Messages.RemoveAt(this.Messages.Count - 1);
                 }
                 OnPropertyChanged("Messages_Item");

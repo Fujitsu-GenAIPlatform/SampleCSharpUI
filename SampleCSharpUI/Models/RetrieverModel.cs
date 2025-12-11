@@ -94,7 +94,7 @@ namespace SampleCSharpUI.Models
                 this.Retrievers.Add(new Models.TDataRetriever()
                 {
                     ID = string.Empty,
-                    Name = "none"
+                    Name = "(none)"
                 });
             }
 
