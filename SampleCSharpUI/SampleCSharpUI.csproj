@@ -157,6 +157,7 @@
     <Compile Include="Converters\Boolean2VisibilityConverter.cs" />
     <Compile Include="Converters\DoubleToGridLengthConverter.cs" />
     <Compile Include="Converters\Long2LocalDateTimeConverter.cs" />
+    <Compile Include="Converters\MarkdownToFlowDocumentConverter.cs" />
     <Compile Include="Converters\NegativeConverter.cs" />
     <Compile Include="Converters\Null2FalseConverter.cs" />
     <Compile Include="Converters\RoleToHorizontalAlignmentConverter.cs" />

@@ -88,7 +88,7 @@ namespace SampleCSharpUI.Properties {
         }
         
         /// <summary>
-        ///   NonPrompt に類似しているローカライズされた文字列を検索します。
+        ///   非対話認証 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string AuthenticationTypeNonPrompt {
             get {

@@ -187,7 +187,7 @@
     <value>対話認証</value>
   </data>
   <data name="AuthenticationTypeNonPrompt" xml:space="preserve">
-    <value>NonPrompt</value>
+    <value>非対話認証</value>
   </data>
   <data name="UseOSWebView" xml:space="preserve">
     <value>(高度なオプション) アプリ組込のユーザ認証画面が動作しないため、OS規定ブラウザを使用する</value>

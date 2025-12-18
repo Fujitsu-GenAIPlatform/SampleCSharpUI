@@ -26,7 +26,11 @@ namespace SampleCSharpUI.Converters
             var paragraphs = Regex.Split(text.Trim(), @"\r?\n\s*\r?\n");
             foreach (var paraText in paragraphs)
             {
-                var p = new Paragraph();
+                var p = new Paragraph() {
+                    Margin = new Thickness(0, 0, 0, 0), 
+                    FontFamily = System.Windows.SystemFonts.MessageFontFamily,
+                    FontSize = System.Windows.SystemFonts.MessageFontSize
+                };
                 AppendInlines(p.Inlines, paraText);
                 doc.Blocks.Add(p);
             }
