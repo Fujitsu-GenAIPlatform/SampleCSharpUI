@@ -317,7 +317,8 @@ namespace SampleCSharpUI.ViewModels
                                     // メッセージを追加（ここではローカルに追加するのみ）
                                     var content = this.InputText.Trim();
                                     this.InputText = string.Empty;
-                                    if (!string.IsNullOrEmpty(this.SelectedChatRoom.ID))
+                                    
+                                    if (!string.IsNullOrEmpty(this.SelectedChatRoom?.ID))
                                     {
                                         await this.Model.SendMessageAsync(this.SelectedChatRoom.ID, content);
                                     }
