@@ -11,6 +11,12 @@ namespace SampleCSharpUI.Models
 {
     public class TMessage : INotifyPropertyChanged
     {
+        private Guid _Id { get; set; } = Guid.NewGuid();
+        public Guid Id
+        {
+            get { return _Id; }
+        }
+
         private string _Role { get; set; } = string.Empty;
         public string Role
         {

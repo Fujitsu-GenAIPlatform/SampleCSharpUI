@@ -439,16 +439,12 @@ namespace SampleCSharpUI.Models
                         {
                             var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChatMessage));
                             {
+                                // 質問のメッセージ追加
                                 var item = ser.ReadObject(json) as APIData.TChatMessage;
-                                var message = new TMessage()
-                                {
-                                    Role = item.role,
-                                    Content = item.content,
-                                    Time = DateTimeOffset.FromUnixTimeMilliseconds(item.timeunix).ToLocalTime().DateTime,
-                                    Refs = item.ref_chunks is null ? new List<string>() : item.ref_chunks?.Select((x) => x.text.Replace("\n\n", "\n")).ToList(),
-                                };
-                                message.PropertyChanged += (s, e) => { OnPropertyChanged("Messages_Item"); };
-                                this.Messages.Add(message);
+                                this.SetMessage(item.role, 
+                                    item.content, 
+                                    DateTimeOffset.FromUnixTimeMilliseconds(item.timeunix).ToLocalTime().DateTime,
+                                    item.ref_chunks is null ? new List<string>() : item.ref_chunks?.Select((x) => x.text.Replace("\n\n", "\n")).ToList());
                             }
                             json.Close();
 
@@ -457,26 +453,36 @@ namespace SampleCSharpUI.Models
                         }
 
                         // AIからの回答取得
-                        jsonString = await HttpHelper.PostRequestAsync($"/api/v1/chats/{id}/messages/createNextAiMessage", this.IdToken, "{}");
-                        using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+                        var msgId = this.SetMessage("ai", "thinking....", DateTime.UtcNow.ToLocalTime(), new List<string>());
+                        OnPropertyChanged("Messages_Item");
+                        try
                         {
-                            var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChatMessage));
+                            jsonString = await HttpHelper.PostRequestAsync($"/api/v1/chats/{id}/messages/createNextAiMessage", this.IdToken, "{}");
+                            // TODO:streaming対応(API側の対応待ち)
+                            // jsonString = await HttpHelper.PostRequestAsync(msgId, $"/api/v1/chats/{id}/messages/createNextAiMessage/streaming", this.IdToken, "{}");                        
+                            using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
                             {
-                                var item = ser.ReadObject(json) as APIData.TChatMessage;
-                                var message = new TMessage()
+                                var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChatMessage));
                                 {
-                                    Role = item.role,
-                                    Content = item.content,
-                                    Time = DateTimeOffset.FromUnixTimeMilliseconds(item.timeunix).ToLocalTime().DateTime,
-                                    Refs = item.ref_chunks is null ? new List<string>() : item.ref_chunks?.Select((x) => x.text.Replace("\n\n", "\n")).ToList(),
-                                };
-                                message.PropertyChanged += (s, e) => { OnPropertyChanged("Messages_Item"); };
-                                this.Messages.Add(message);
+                                    // 回答のメッセージ追加
+                                    var item = ser.ReadObject(json) as APIData.TChatMessage;
+                                    this.SetMessage(msgId,
+                                        item.role,
+                                        item.content,
+                                        DateTimeOffset.FromUnixTimeMilliseconds(item.timeunix).ToLocalTime().DateTime,
+                                        item.ref_chunks is null ? new List<string>() : item.ref_chunks?.Select((x) => x.text.Replace("\n\n", "\n")).ToList());
+                                }
+                                json.Close();
                             }
-                            json.Close();
 
                             // 最新行表示
                             OnPropertyChanged("Messages_Item");
+                        }
+                        catch (Exception ex)
+                        {
+                            // エラー発生時はAI回答欄を削除し、exceptionを投げる
+                            this.Messages.Remove(this.Messages.Where((x) => x.Id == msgId).FirstOrDefault());
+                            throw ex;
                         }
                     }
                 }
@@ -508,23 +514,34 @@ namespace SampleCSharpUI.Models
                 // ここで body を JSON 文字列にシリアライズして変数に格納する
                 using (var ms = new MemoryStream())
                 {
+                    var msgId = this.SetMessage("ai", "thinking....", DateTime.UtcNow.ToLocalTime(), new List<string>());
+                    OnPropertyChanged("Messages_Item");
                     var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TNonRoomRequest));
                     {
                         serializer.WriteObject(ms, body);
-                        var bodyJsonString = Encoding.UTF8.GetString(ms.ToArray());
-                        var jsonString = await HttpHelper.PostRequestAsync($"/api/v1/action/defined/text:simple_chat/call", this.IdToken, bodyJsonString);
-                        using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+                        try
                         {
-                            var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TNonRoomResponse));
+                            var bodyJsonString = Encoding.UTF8.GetString(ms.ToArray());
+                            var jsonString = await HttpHelper.PostRequestAsync($"/api/v1/action/defined/text:simple_chat/call", this.IdToken, bodyJsonString);
+                            using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
                             {
-                                // 回答のメッセージ追加
-                                var item = ser.ReadObject(json) as APIData.TNonRoomResponse;
-                                this.SetMessage("ai",item.answer, DateTime.UtcNow.ToLocalTime(), new List<string>());
-                            }
-                            json.Close();
+                                var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TNonRoomResponse));
+                                {
+                                    // 回答のメッセージ追加
+                                    var item = ser.ReadObject(json) as APIData.TNonRoomResponse;
+                                    this.SetMessage(msgId, "ai", item.answer, DateTime.UtcNow.ToLocalTime(), new List<string>());
+                                }
+                                json.Close();
 
-                            // 最新行表示
-                            OnPropertyChanged("Messages_Item");
+                                // 最新行表示
+                                OnPropertyChanged("Messages_Item");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // エラー発生時はAI回答欄を削除し、exceptionを投げる
+                            this.Messages.Remove(this.Messages.Where((x) => x.Id == msgId).FirstOrDefault());
+                            throw ex;
                         }
                     }
                 }
@@ -557,7 +574,7 @@ namespace SampleCSharpUI.Models
         }
 
         // メッセージ追加(チャットルームなし)
-        private void SetMessage(string role, string content, DateTime time, List<string> refs)
+        private Guid SetMessage(string role, string content, DateTime time, List<string> refs)
         {
             var msg = new TMessage()
             {
@@ -568,6 +585,28 @@ namespace SampleCSharpUI.Models
             };
             msg.PropertyChanged += (s, e) => { OnPropertyChanged("Messages_Item"); };
             this.Messages.Add(msg);
+            return msg.Id;
+        }
+        private Guid SetMessage(Guid id, string role, string content, DateTime time, List<string> refs)
+        {
+            // 指定された ID を持つ既存メッセージを検索
+            var existing = this.Messages.FirstOrDefault(m => m.Id == id);
+            if (existing != null)
+            {
+                // 見つかったら内容を更新
+                existing.Role = role;
+                existing.Content = content;
+                existing.Time = time;
+                existing.Refs = refs ?? new List<string>();
+
+                // コレクション内アイテムの更新を UI に通知
+                return existing.Id;
+            }
+            else
+            {
+                // 見つかったら内容を追加
+                return SetMessage(role, content, time, refs);
+            }
         }
 
         /// <summary>
