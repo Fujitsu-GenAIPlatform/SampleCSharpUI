@@ -5,11 +5,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Xml.Linq;
 
 namespace SampleCSharpUI.ViewModels
 {
@@ -157,6 +154,12 @@ namespace SampleCSharpUI.ViewModels
                         OnMessaged(ex.Message);
                     }
                     this.IsBusy = false;
+                }
+
+                // Streaming完了通知を受け取った場合、処理中フラグをOFF
+                if (e.PropertyName == "IsStreaming" && this.Model.IsStreaming == false)
+                {
+                    this.EndPreviewKeyDownCommand();
                 }
             };
         }
@@ -320,7 +323,8 @@ namespace SampleCSharpUI.ViewModels
                                     
                                     if (!string.IsNullOrEmpty(this.SelectedChatRoom?.ID))
                                     {
-                                        await this.Model.SendMessageAsync(this.SelectedChatRoom.ID, content);
+                                        //await this.Model.SendMessageAsync(this.SelectedChatRoom.ID, content);
+                                        await this.Model.SendMessageStreamingAsync(this.SelectedChatRoom.ID, content);
                                     }
                                     else
                                     {
@@ -332,8 +336,10 @@ namespace SampleCSharpUI.ViewModels
                                     // Command内で例外が発生した場合はここでキャッチしてメッセージ表示
                                     OnMessaged(ex.Message);
                                 }
-                                this.IsBusy = false;
-                                OnMessaged("PreviewKeyDownCommand");
+                                if (this.Model.IsStreaming == false)
+                                {
+                                    this.EndPreviewKeyDownCommand();
+                                }
                             }
                         }
                     });
@@ -344,6 +350,11 @@ namespace SampleCSharpUI.ViewModels
             {
                 _PreviewKeyDownCommand = value;
             }
+        }
+        private void EndPreviewKeyDownCommand()
+        {
+            this.IsBusy = false;
+            OnMessaged("PreviewKeyDownCommand");
         }
 
         /// <summary>

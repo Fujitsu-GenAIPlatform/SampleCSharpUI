@@ -493,6 +493,15 @@ namespace SampleCSharpUI.Properties {
         }
         
         /// <summary>
+        ///   Thinking...⌛ に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Streaming {
+            get {
+                return ResourceManager.GetString("Streaming", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   ランダム性 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Temperature {

@@ -1,20 +1,17 @@
 ﻿using SampleCSharpUI.Commons;
+using SampleCSharpUI.Properties;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Runtime.CompilerServices;
-using System.Runtime.ConstrainedExecution;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Windows.Threading;
-using static SampleCSharpUI.Commons.APIData;
 
 namespace SampleCSharpUI.Models
 {
@@ -39,6 +36,23 @@ namespace SampleCSharpUI.Models
                 if (_IsLogin != value)
                 {
                     _IsLogin = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Streaming受信中
+        /// </summary>
+        private bool _IsStreaming = false;
+        public bool IsStreaming
+        {
+            get { return _IsStreaming; }
+            private set
+            {
+                if (_IsStreaming != value)
+                {
+                    _IsStreaming = value;
                     OnPropertyChanged();
                 }
             }
@@ -441,8 +455,8 @@ namespace SampleCSharpUI.Models
                             {
                                 // 質問のメッセージ追加
                                 var item = ser.ReadObject(json) as APIData.TChatMessage;
-                                this.SetMessage(item.role, 
-                                    item.content, 
+                                this.SetMessage(item.role,
+                                    item.content,
                                     DateTimeOffset.FromUnixTimeMilliseconds(item.timeunix).ToLocalTime().DateTime,
                                     item.ref_chunks is null ? new List<string>() : item.ref_chunks?.Select((x) => x.text.Replace("\n\n", "\n")).ToList());
                             }
@@ -453,13 +467,11 @@ namespace SampleCSharpUI.Models
                         }
 
                         // AIからの回答取得
-                        var msgId = this.SetMessage("ai", "thinking....", DateTime.UtcNow.ToLocalTime(), new List<string>());
+                        var msgId = this.SetMessage("ai", Resources.Streaming, DateTime.UtcNow.ToLocalTime(), new List<string>());
                         OnPropertyChanged("Messages_Item");
                         try
                         {
                             jsonString = await HttpHelper.PostRequestAsync($"/api/v1/chats/{id}/messages/createNextAiMessage", this.IdToken, "{}");
-                            // TODO:streaming対応(API側の対応待ち)
-                            // jsonString = await HttpHelper.PostRequestAsync(msgId, $"/api/v1/chats/{id}/messages/createNextAiMessage/streaming", this.IdToken, "{}");                        
                             using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
                             {
                                 var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChatMessage));
@@ -490,6 +502,163 @@ namespace SampleCSharpUI.Models
         }
 
         /// <summary>
+        /// プロンプト入力(Stream受信)
+        /// </summary>
+        /// <param name="id">ルームID</param>
+        /// <param name="inputText">入力</param>
+        internal async Task SendMessageStreamingAsync(string id, string inputText)
+        {
+            var content = inputText ?? string.Empty;
+            if (!string.IsNullOrWhiteSpace(content))
+            {
+                var body = new APIData.TChatMessage()
+                {
+                    role = "user",
+                    content = content,
+                };
+
+                // ここで body を JSON 文字列にシリアライズして変数に格納する
+                using (var ms = new MemoryStream())
+                {
+                    var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChatMessage));
+                    {
+                        serializer.WriteObject(ms, body);
+                        var bodyJsonString = Encoding.UTF8.GetString(ms.ToArray());
+                        var jsonString = await HttpHelper.PostRequestAsync($"/api/v1/chats/{id}/messages", this.IdToken, bodyJsonString);
+                        using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+                        {
+                            var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChatMessage));
+                            {
+                                // 質問のメッセージ追加
+                                var item = ser.ReadObject(json) as APIData.TChatMessage;
+                                this.SetMessage(item.role,
+                                    item.content,
+                                    DateTimeOffset.FromUnixTimeMilliseconds(item.timeunix).ToLocalTime().DateTime,
+                                    item.ref_chunks is null ? new List<string>() : item.ref_chunks?.Select((x) => x.text.Replace("\n\n", "\n")).ToList());
+                            }
+                            json.Close();
+
+                            // 最新行表示
+                            OnPropertyChanged("Messages_Item");
+                        }
+
+                        // AIからの回答取得
+                        var msgId = this.SetMessage("ai", Resources.Streaming, DateTime.UtcNow.ToLocalTime(), new List<string>());
+                        OnPropertyChanged("Messages_Item");
+                        try
+                        {
+                            // Stream受信イベントハンドラー登録
+                            HttpHelper.StreamEventReceived += async (s, e) =>
+                            {
+                                // data: {"type": "on_create_next_ai_message_start"}
+                                // data: {"type": "on_llm_new_token", "token": "\u30cd\u30c3\u30c8\u30ef\u30fc\u30af"}
+                                // data: {"type": "on_create_next_ai_message_end"}
+                                try
+                                {
+                                    var jsonEventString = e.EventText.Replace("data: ", "");
+                                    using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonEventString)))
+                                    {
+                                        var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChatStream));
+                                        {
+                                            // 回答のメッセージ追加
+                                            var item = ser.ReadObject(json) as APIData.TChatStream;
+                                            var targetId = e.Id;
+                                            switch (item.type)
+                                            {
+                                                case "on_create_next_ai_message_start":
+                                                    {
+                                                        var message = this.Messages.Where((x) => x.Id == targetId).FirstOrDefault();
+                                                        if (message != null)
+                                                        {
+                                                            this.SetMessage(targetId,
+                                                                message.Role,
+                                                                string.Empty,
+                                                                message.Time,
+                                                                message.Refs);
+                                                        }
+                                                        break;
+                                                    }
+                                                case "on_create_next_ai_message_end":
+                                                    {
+                                                        //TODO: 最終的な戻り値は、ルームの中の回答から取得する
+                                                        await this.GetLastAIResponseAsync(id);
+                                                        this.IsStreaming = false;
+                                                        break;
+                                                    }
+                                                default:
+                                                    {
+                                                        // item.token が JSON の Unicode エスケープ (例: "\u30cd...") の場合に実際の文字に変換する
+                                                        var tokenText = HttpHelper.DecodeEscapedUnicode(item.token);
+                                                        var message = this.Messages.Where((x) => x.Id == targetId).FirstOrDefault();
+                                                        if (message != null && !string.IsNullOrEmpty(tokenText))
+                                                        {
+                                                            // Streamingが重複して送られてくる場合があるため、重複分は追加しない
+                                                            if (!message.Content.EndsWith(tokenText, StringComparison.Ordinal))
+                                                            {
+                                                                this.SetMessage(targetId,
+                                                                    message.Role,
+                                                                    message.Content + tokenText,
+                                                                    message.Time,
+                                                                    message.Refs);
+                                                            }
+                                                        }
+                                                        break;
+                                                    }
+                                            }
+                                        }
+                                        json.Close();
+                                    }
+                                    OnPropertyChanged("Messages_Item");
+                                }
+                                catch {
+                                    this.IsStreaming = false;
+                                    // エラー発生時はAI回答欄を削除する。
+                                    this.Messages.Remove(this.Messages.Where((x) => x.Id == msgId).FirstOrDefault());
+
+                                    // エラー伝搬は省略（必要であればイベントを定義して伝搬すること）
+                                    //throw ex;
+                                }
+                            };
+
+                            // Stream受信開始
+                            this.IsStreaming = true;
+                            jsonString = await HttpHelper.PostRequestStreamAsync(msgId, $"/api/v1/chats/{id}/messages/createNextAiMessage/streaming", this.IdToken, "{}");
+                        }
+                        catch (Exception ex)
+                        {
+                            this.IsStreaming = false;
+                            // エラー発生時はAI回答欄を削除し、exceptionを投げる
+                            this.Messages.Remove(this.Messages.Where((x) => x.Id == msgId).FirstOrDefault());
+                            throw ex;
+                        }
+                    }
+                }
+            }
+        }
+        private async Task GetLastAIResponseAsync(string id)
+        {
+            var jsonString = await HttpHelper.GetRequestAsync($"/api/v1/chats/{id}", this.IdToken);
+            using (var json = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+            {
+                var ser = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TChat));
+                {
+                    var result = ser.ReadObject(json) as APIData.TChat;
+                    var item = result.messages.Where((x) => x.role == "ai").LastOrDefault();
+                    var lastItem = this.Messages.Where((x) => x.Role == "ai").LastOrDefault();
+                    if (lastItem != null) {
+                        SetMessage(lastItem.Id,
+                            item.role, item.content, 
+                            DateTimeOffset.FromUnixTimeMilliseconds(item.timeunix).ToLocalTime().DateTime, 
+                            item.ref_chunks is null ? new List<string>() : item.ref_chunks?.Select((x) => x.text.Replace("\n\n", "\n")).ToList());
+                    }
+
+                    // 最新行表示
+                    OnPropertyChanged("Messages_Item");
+                }
+            }
+        }
+
+        /// <summary>
         /// プロンプト入力(チャットルームなし)
         /// </summary>
         /// <param name="inputText">入力</param>
@@ -514,7 +683,7 @@ namespace SampleCSharpUI.Models
                 // ここで body を JSON 文字列にシリアライズして変数に格納する
                 using (var ms = new MemoryStream())
                 {
-                    var msgId = this.SetMessage("ai", "thinking....", DateTime.UtcNow.ToLocalTime(), new List<string>());
+                    var msgId = this.SetMessage("ai", Resources.Streaming, DateTime.UtcNow.ToLocalTime(), new List<string>());
                     OnPropertyChanged("Messages_Item");
                     var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(APIData.TNonRoomRequest));
                     {

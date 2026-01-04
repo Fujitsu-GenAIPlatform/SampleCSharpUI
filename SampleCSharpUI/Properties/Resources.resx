@@ -270,4 +270,7 @@
   <data name="OK" xml:space="preserve">
     <value>OK</value>
   </data>
+  <data name="Streaming" xml:space="preserve">
+    <value>Thinking...⌛</value>
+  </data>
 </root>
