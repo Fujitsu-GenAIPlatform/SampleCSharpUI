@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("富士通株式会社")]
 [assembly: AssemblyProduct("Windows UI Sample for Fujitsu Cloud Service Generative AI Platform")]
-[assembly: AssemblyCopyright("Copyright © 富士通株式会社 2025")]
+[assembly: AssemblyCopyright("Copyright © 富士通株式会社 2026")]
 [assembly: AssemblyTrademark("Fujitsu Cloud Service Generative AI Platform")]
 [assembly: AssemblyCulture("")]
 
@@ -48,5 +48,5 @@ using System.Windows;
 //      ビルド番号
 //      リビジョン
 //
-[assembly: AssemblyVersion("1.3.1.0")]
-[assembly: AssemblyFileVersion("1.3.1.0")]
+[assembly: AssemblyVersion("1.2.0.0")]
+[assembly: AssemblyFileVersion("1.2.0.0")]
