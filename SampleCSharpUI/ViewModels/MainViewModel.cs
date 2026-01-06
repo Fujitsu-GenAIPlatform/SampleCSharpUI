@@ -227,6 +227,30 @@ namespace SampleCSharpUI.ViewModels
         }
 
         /// <summary>
+        /// メッセージの内容をMarkdown形式で保存する
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        internal async Task SaveMessagesAsMarkdownAsync(string path)
+        {
+            this.IsBusy = true;
+            try
+            {
+                await this.Model.SaveMessagesAsMarkdownAsync(path);
+            }
+            catch (Exception ex)
+            {
+                // ViewModel 内で発生したエラーは UI に通知するため OnMessaged で投げる
+                OnMessaged(ex.Message);
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+
+        /// <summary>
         /// サブ画面表示
         /// </summary>
         RelayCommand<string> _ShowDialogCommand;

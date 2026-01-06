@@ -385,6 +385,15 @@ namespace SampleCSharpUI.Properties {
         }
         
         /// <summary>
+        ///   名前を付けて保存(_A)... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuSave {
+            get {
+                return ResourceManager.GetString("MenuSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   接続設定(_S)... に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MenuSettings {
@@ -444,6 +453,15 @@ namespace SampleCSharpUI.Properties {
         public static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   保存しました。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Saved {
+            get {
+                return ResourceManager.GetString("Saved", resourceCulture);
             }
         }
         

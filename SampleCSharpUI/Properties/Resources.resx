@@ -273,4 +273,10 @@
   <data name="Streaming" xml:space="preserve">
     <value>Thinking...⌛</value>
   </data>
+  <data name="MenuSave" xml:space="preserve">
+    <value>名前を付けて保存(_A)...</value>
+  </data>
+  <data name="Saved" xml:space="preserve">
+    <value>保存しました。</value>
+  </data>
 </root>

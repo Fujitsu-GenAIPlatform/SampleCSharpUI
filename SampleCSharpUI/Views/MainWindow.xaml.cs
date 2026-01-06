@@ -122,6 +122,26 @@ namespace SampleCSharpUI.Views
                             }
                             break;
 
+                        case "Save":
+                            {
+                                // ファイル保存ダイアログを開いて、選択されたパスを ViewModel 経由で保存処理に渡す
+                                var dlg = new Microsoft.Win32.SaveFileDialog()
+                                {
+                                    Filter = "Markdownファイル (*.md)|*.md|すべてのファイル (*.*)|*.*",
+                                    DefaultExt = "md",
+                                    FileName = $"Chat_{DateTime.Now:yyyyMMdd_HHmmss}.md",
+                                    AddExtension = true,
+                                    OverwritePrompt = true
+                                };
+                                var result = dlg.ShowDialog(this);
+                                if (result == true)
+                                {
+                                    await this.ViewModel.SaveMessagesAsMarkdownAsync(dlg.FileName);
+                                    MessageBox.Show(this,  "保存しました。", this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                                }
+                            }
+                            break;
+
                         default:
                             {
                                 // ViewModelの処理で例外が発生した場合はここでキャッチしてメッセージ表示

@@ -812,6 +812,49 @@ namespace SampleCSharpUI.Models
             }
             return promptText;
         }
+
+        /// <summary>
+        /// Messages の内容を Markdown 形式でファイルに保存する
+        /// </summary>
+        /// <param name="path">保存先のファイルパス</param>
+        internal async Task SaveMessagesAsMarkdownAsync(string path)
+        {
+            var sb = new System.Text.StringBuilder();
+
+            if (!string.IsNullOrEmpty(path))
+            {
+                // ヘッダ
+                sb.AppendLine($"# Chat Export ({DateTime.Now:yyyy-MM-dd HH:mm:ss})");
+                sb.AppendLine();
+
+                foreach (var msg in this.Messages)
+                {
+                    var time = msg.Time.ToString("yyyy-MM-dd HH:mm:ss");
+
+                    sb.AppendLine($"---");
+                    if (msg.Role == "user")
+                    {
+                        sb.AppendLine($"#### User ({time})");
+                    }
+                    else if (msg.Role == "ai")
+                    {
+                        sb.AppendLine($"#### AI ({time})");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"#### {msg.Role} ({time})");
+                    }
+                    sb.AppendLine($"---");
+                    sb.AppendLine(msg.Content ?? string.Empty);
+                    sb.AppendLine();
+                }
+
+                var content = sb.ToString();
+
+                // 書き込みはバックグラウンドで行う（.NET Framework 4.7.2）
+                await Task.Run(() => System.IO.File.WriteAllText(path, content, System.Text.Encoding.UTF8));
+            }
+        }
         #endregion
 
         // プロパティが変更されたときに通知するイベント

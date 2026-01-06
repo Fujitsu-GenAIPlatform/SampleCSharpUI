@@ -193,6 +193,8 @@
                     </ItemsPanelTemplate>
                 </Menu.ItemsPanel>
                 <MenuItem Header="{x:Static prop:Resources.MenuFile}">
+                    <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="Save" Header="{x:Static prop:Resources.MenuSave}" />
+                    <Separator />
                     <MenuItem Header="{x:Static prop:Resources.MenuRAG}" IsEnabled="{Binding IsLogin}">
                         <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="CreateRetriever" Header="{x:Static prop:Resources.MenuCreateRetriever}" />
                         <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="ManageRetrievers" Header="{x:Static prop:Resources.MenuManageRetrievers}" />
@@ -202,7 +204,7 @@
                     <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="Disconnect" Header="{x:Static prop:Resources.MenuDisconnect}" Visibility="{Binding IsLogin, Converter={StaticResource Boolean2VisibilityConverter}}" />
                     <MenuItem Command="{Binding ShowDialogCommand}" CommandParameter="Settings" Header="{x:Static prop:Resources.MenuSettings}" />
                     <Separator />
-                    <MenuItem Header="{x:Static prop:Resources.MenuCreateRetriever}">
+                    <MenuItem Header="{x:Static prop:Resources.MenuExit}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Click">
                                 <i:CallMethodAction TargetObject="{Binding ElementName=window}" MethodName="Close" />
