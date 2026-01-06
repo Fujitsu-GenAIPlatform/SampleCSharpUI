@@ -14,7 +14,6 @@ namespace SampleCSharpUI.Views
         private SynchronizationContext Context { get; set; } = SynchronizationContext.Current;
 
         public ViewModels.MainViewModel ViewModel { get; } = App.MainVM;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -127,7 +126,7 @@ namespace SampleCSharpUI.Views
                                 // ファイル保存ダイアログを開いて、選択されたパスを ViewModel 経由で保存処理に渡す
                                 var dlg = new Microsoft.Win32.SaveFileDialog()
                                 {
-                                    Filter = "Markdownファイル (*.md)|*.md|すべてのファイル (*.*)|*.*",
+                                    Filter = Properties.Resources.SaveFilter,
                                     DefaultExt = "md",
                                     FileName = $"Chat_{DateTime.Now:yyyyMMdd_HHmmss}.md",
                                     AddExtension = true,
@@ -137,7 +136,7 @@ namespace SampleCSharpUI.Views
                                 if (result == true)
                                 {
                                     await this.ViewModel.SaveMessagesAsMarkdownAsync(dlg.FileName);
-                                    MessageBox.Show(this,  "保存しました。", this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                                    MessageBox.Show(this, Properties.Resources.Saved, this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
                                 }
                             }
                             break;

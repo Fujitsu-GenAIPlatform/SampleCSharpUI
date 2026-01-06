@@ -831,22 +831,22 @@ namespace SampleCSharpUI.Models
                 {
                     var time = msg.Time.ToString("yyyy-MM-dd HH:mm:ss");
 
-                    sb.AppendLine($"---");
                     if (msg.Role == "user")
                     {
-                        sb.AppendLine($"#### User ({time})");
+                        sb.AppendLine($"#### ■■■ User ({time}) ■■■");
                     }
                     else if (msg.Role == "ai")
                     {
-                        sb.AppendLine($"#### AI ({time})");
+                        sb.AppendLine($"#### ■■■ AI ({time}) ■■■");
                     }
                     else
                     {
-                        sb.AppendLine($"#### {msg.Role} ({time})");
+                        sb.AppendLine($"#### ■■■ {msg.Role} ({time}) ■■■");
                     }
                     sb.AppendLine($"---");
                     sb.AppendLine(msg.Content ?? string.Empty);
                     sb.AppendLine();
+                    sb.AppendLine($"---");
                 }
 
                 var content = sb.ToString();

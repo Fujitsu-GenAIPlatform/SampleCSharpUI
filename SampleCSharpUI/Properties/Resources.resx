@@ -279,4 +279,7 @@
   <data name="Saved" xml:space="preserve">
     <value>保存しました。</value>
   </data>
+  <data name="SaveFilter" xml:space="preserve">
+    <value>Markdownファイル (*.md)|*.md|すべてのファイル (*.*)|*.*</value>
+  </data>
 </root>

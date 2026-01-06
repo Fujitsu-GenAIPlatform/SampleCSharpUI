@@ -466,6 +466,15 @@ namespace SampleCSharpUI.Properties {
         }
         
         /// <summary>
+        ///   Markdownファイル (*.md)|*.md|すべてのファイル (*.*)|*.* に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SaveFilter {
+            get {
+                return ResourceManager.GetString("SaveFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   RAG指定 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string SelectedRetriever {
